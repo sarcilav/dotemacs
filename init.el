@@ -5,10 +5,6 @@
 
 (server-start)
 
-(require 'personal)
-(require 'face)
-(require 'bindings)
-
 ;; Start ido
 (require 'ido)
 (ido-mode t)
@@ -19,3 +15,15 @@
              '("marmalade" .
                "http://marmalade-repo.org/packages/"))
 (package-initialize)
+
+;; Requiring elpa packages
+
+;; yasnisppet
+(require 'yasnippet)
+(yas-global-mode 1)
+
+
+;; Custom 'packages'
+(require 'personal)
+(require 'face)
+(require 'bindings)

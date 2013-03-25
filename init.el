@@ -3,6 +3,8 @@
 
 (add-to-list 'load-path "~/.emacs24.d")
 
+(server-start)
+
 (require 'personal)
 (require 'face)
 (require 'bindings)

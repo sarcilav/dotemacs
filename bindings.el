@@ -8,4 +8,6 @@
 (global-set-key [(meta -)] 'font-smaller)
 (global-set-key [(meta \+)] 'font-larger)
 
+;; Go Full Screen
+(global-set-key [(meta n)] 'toggle-frame-fullscreen)
 (provide 'bindings)

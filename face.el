@@ -21,5 +21,12 @@
 ;; Theme
 (load-theme 'wombat) ;; only works on emacs 24
 
+;; no tabs
+(setq-default indent-tabs-mode nil)
+
+;; Electric mode
+(electric-indent-mode)
+(electric-pair-mode)
+
 
 (provide 'face)

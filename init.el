@@ -1,13 +1,13 @@
-(setq user-mail-address "sebastianarcila@gmail.com")
-(setq user-full-name "Sebastian Arcila-Valenzuela")
-
 (add-to-list 'load-path "~/.emacs.d")
 
+(load "misc.el")
 (server-start)
 
 ;; Start ido
 (require 'ido)
 (ido-mode t)
+
+
 
 ;; add marmalade
 (require 'package)

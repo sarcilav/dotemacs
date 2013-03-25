@@ -11,6 +11,4 @@
 ;; Go Full Screen
 (global-set-key [(meta n)] 'toggle-frame-fullscreen)
 
-;; Use tab for dabbrev-expand aka completation
-(global-set-key [tab] 'dabbrev-expand)
 (provide 'bindings)

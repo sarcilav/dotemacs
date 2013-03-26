@@ -40,14 +40,15 @@ like a lot changed.
 
 It has a lot of batteries included
 
-* Ido mode, yes!, you just need to add
-* Some themes, for example `(load-theme 'wombat)`
-* Package, you don't need to install anything to start using the ELPA
-* Electric modes, I'm using the electric-indent-mode and the electric-pair-mode
+* Ido mode, yes!, you just need to add `(require 'ido)` and `(ido-mode
+t)` to your init file.
+* Some themes, for example `(load-theme 'wombat)`.
+* Package, you don't need to install anything to start using the ELPA.
+* Electric modes, I'm using the electric-indent-mode and the electric-pair-mode.
 * And probably more, but for now  are the included things that I'm
-using
+using.
 * Ahh, I also forgot that since I installed Mountain Lion. I got
   some weird behavior with the emacs window system, that don't allow
   me to tab between applications back and forth as usual. This problem
   was completely solved with the compilated version of emacs 24. The
-  emacs 22 that I used was Carbon Emacs if I'm not wrong
+  emacs 22 that I used was Carbon Emacs if I'm not wrong.

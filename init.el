@@ -1,3 +1,4 @@
+
 (add-to-list 'load-path "~/.emacs.d")
 
 (load "misc.el")
@@ -17,13 +18,15 @@
 (package-initialize)
 
 ;; Requiring elpa packages
-;; yasnisppet
 (require 'yasnippet)
 (yas-global-mode 1)
 
-;; Custom 'packages'
-(require 'personal)
-(require 'face)
-(require 'hooks)
-(require 'bindings)
-(require 'modes)
+(require 'pretty-lambdada)
+(pretty-lambda-for-modes)
+
+
+;; Custom 'files'
+(load "personal.el")
+(load "face.el")
+(load "bindings.el")
+(load "modes.el")

@@ -11,4 +11,3 @@
 ;; Go Full Screen
 (global-set-key [(meta n)] 'toggle-frame-fullscreen)
 
-(provide 'bindings)

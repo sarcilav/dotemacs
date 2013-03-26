@@ -28,5 +28,6 @@
 (electric-indent-mode)
 (electric-pair-mode)
 
+;; Enable auto-fill
+(setq-default auto-fill-function 'do-auto-fill)
 
-(provide 'face)

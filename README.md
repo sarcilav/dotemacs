@@ -58,7 +58,6 @@ TODO
 ====
 
 * Add slime.
-* Add the old snippets (or more snippets).
 * Add something for rails dev (rinari?).
 * Try again git inside emacs.
 * Look into im, mailing, ... blogging options.

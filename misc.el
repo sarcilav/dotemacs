@@ -11,3 +11,17 @@
 
 (setq user-mail-address "sebastianarcila@gmail.com")
 (setq user-full-name "Sebastian Arcila-Valenzuela")
+
+;; set path
+
+(let ((path))
+  (setq path (concat "/usr/local/heroku/bin:"
+                     "/usr/bin:"
+                     "/bin:"
+                     "/usr/sbin:"
+                     "/sbin:"
+                     "/usr/local/bin:"
+                     "/opt/X11/bin:"
+                     "/usr/texbin:"
+                     "~/.rvm/bin"))
+  (setenv "PATH" path))

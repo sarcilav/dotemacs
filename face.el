@@ -9,7 +9,7 @@
 (global-font-lock-mode t)
 (show-paren-mode 1)
 (prefer-coding-system 'utf-8)
-
+(blink-cursor-mode t)
 ;; nice fonts in OS X
 (setq mac-allow-anti-aliasing t)
 (set-default-font "-apple-inconsolata-medium-r-normal--0-0-0-0-m-0-iso10646-1")

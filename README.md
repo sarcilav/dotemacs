@@ -35,6 +35,7 @@ That's all!
 
 Cool Thinks of Emacs 24
 =======================
+
 Note: The last version that I were using of Emacs was the 22, looks
 like a lot changed.
 
@@ -52,3 +53,11 @@ using.
   me to tab between applications back and forth as usual. This problem
   was completely solved with the compilated version of emacs 24. The
   emacs 22 that I used was Carbon Emacs if I'm not wrong.
+
+TODO
+====
+
+* Add slime
+* Add something for rails dev (rinari?)
+* Try again git inside emacs
+* Look into im, mailing, ... blogging options

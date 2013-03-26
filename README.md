@@ -59,5 +59,4 @@ TODO
 
 * Add slime.
 * Add something for rails dev (rinari?).
-* Try again git inside emacs.
 * Look into im, mailing, ... blogging options.

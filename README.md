@@ -48,6 +48,6 @@ It has a lot of batteries included
 using
 * Ahh, I also forgot that since I installed Mountain Lion. I got
   some weird behavior with the emacs window system, that don't allow
-  me to tab between application back and forth as usual. This problem
+  me to tab between applications back and forth as usual. This problem
   was completely solved with the compilated version of emacs 24. The
   emacs 22 that I used was Carbon Emacs if I'm not wrong

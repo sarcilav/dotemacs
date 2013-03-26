@@ -1,0 +1,27 @@
+require "${1:myapp}/init"
+
+require "minitest/autorun"
+require "rack/test"
+
+require "$1"
+
+describe ${2:MyApp} do
+
+  include Rack::Test::Methods
+
+  def app
+    $2.new
+  end
+
+  before do
+    get "${3:/url}"$0
+  end
+
+  it "responds with success" do
+    assert_equal 200, response.status
+  end
+
+  alias_method :request,  :last_request
+  alias_method :response, :last_response
+end
+

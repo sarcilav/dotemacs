@@ -1,0 +1,1 @@
+uki({ view: '${1:Button}', rect: '${2:10 10 10 10}', anchors: '${3:left top}' })$0

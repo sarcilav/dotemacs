@@ -1,0 +1,6 @@
+#name : <section>...</section>
+#group : section
+# --
+<section>
+  $1
+</section>

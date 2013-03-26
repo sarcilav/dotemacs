@@ -1,0 +1,4 @@
+#name : long long ...
+# --
+
+long long ${1:n}

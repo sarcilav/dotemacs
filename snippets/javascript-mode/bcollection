@@ -1,0 +1,15 @@
+#name: Backbone Collection
+# --
+${1:things}: new (Backbone.Collection.extend({
+
+  model: app.models.${2:Thing},
+
+  url: "/${3:things}",
+
+  parse: function (response) {
+    if (response.length > 0) {
+      return response;
+    }
+  }
+  $0
+}))()

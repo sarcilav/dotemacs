@@ -1,0 +1,37 @@
+#name: Node.js module.
+# --
+
+var http = require('http');
+
+process.addListener('uncaughtException', function (err, stack) {
+  console.log('------------------------');
+  console.log('Exception: ' + err);
+  console.log(err.stack);
+  console.log('------------------------');
+});
+
+function ${1:MyModule}(options) {
+  if ( !(this instanceof arguments.callee) )
+    return new arguments.callee(arguments);
+
+  var self = this;
+
+  self.settings = {
+    ${2:port}: options.$2
+  };
+
+  self.init();
+};
+
+$1.prototype.init = function () {
+  var self = this;
+
+  $0
+};
+
+$1.prototype.anInstanceMethod = function () {
+  var self = this;
+};
+
+module.exports = $1;
+

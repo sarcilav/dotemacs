@@ -1,0 +1,5 @@
+#name: describe('Test Object', f...)
+# --
+describe("$1", function () {
+  $0
+});

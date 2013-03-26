@@ -1,0 +1,5 @@
+#name: Backbone Model
+# --
+${1:Thing}: Backbone.Model.extend({
+  $0
+})

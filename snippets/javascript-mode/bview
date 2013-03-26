@@ -1,0 +1,20 @@
+#name: Backbone View
+# --
+${1:Graph}View: Backbone.View.extend({
+
+  initialize: function() {
+    _.bindAll(this, 'render', 'close');
+    this.model.bind('change', this.render);
+  },
+
+  events: {
+    //'keypress input': 'didSearch'
+  },
+
+  render: function () {
+    $(this.el).html(Mustache.to_html($('#template-${2:graph}').html(),
+                                     this.model.toJSON()));
+    return this;
+  }
+  $0
+})

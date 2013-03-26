@@ -1,0 +1,5 @@
+#name: it('Test Name', f...)
+# --
+it("$1", function () {
+  $0
+});

@@ -1,0 +1,13 @@
+#name: Backbone Controller
+# --
+${1:things}Controller: new (Backbone.Controller.extend({
+
+  routes: {
+    'things/:id': 'showThings'
+  }
+
+  showThings: function(id) {
+    $0
+  }
+
+}))()

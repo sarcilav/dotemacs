@@ -11,3 +11,6 @@
 ;; Go Full Screen
 (global-set-key [(meta n)] 'toggle-frame-fullscreen)
 
+;; Use regexp instead
+(global-set-key "\C-s" 'isearch-forward-regexp)
+(global-set-key "\C-r" 'isearch-backward-regexp)

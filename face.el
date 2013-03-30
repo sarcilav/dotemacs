@@ -10,6 +10,7 @@
 (show-paren-mode 1)
 (prefer-coding-system 'utf-8)
 (blink-cursor-mode t)
+
 ;; nice fonts in OS X
 (setq mac-allow-anti-aliasing t)
 (set-default-font "-apple-inconsolata-medium-r-normal--0-0-0-0-m-0-iso10646-1")
@@ -31,3 +32,7 @@
 ;; Enable auto-fill
 (setq-default auto-fill-function 'do-auto-fill)
 
+;; default window size
+(set-frame-height (selected-frame) 50)
+(set-frame-width (selected-frame) 140)
+(set-frame-position (selected-frame) 0 0)

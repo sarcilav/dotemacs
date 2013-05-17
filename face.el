@@ -30,9 +30,14 @@
 (electric-pair-mode)
 
 ;; Enable auto-fill
-(setq-default auto-fill-function 'do-auto-fill)
+;; (setq-default auto-fill-function 'do-auto-fill)
 
 ;; default window size
 (set-frame-height (selected-frame) 50)
 (set-frame-width (selected-frame) 140)
 (set-frame-position (selected-frame) 0 0)
+
+;; Change c indent to linux style
+(setq c-default-style "linux"
+      c-basic-offset 2)
+

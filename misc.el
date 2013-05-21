@@ -25,3 +25,13 @@
                      "/usr/texbin:"
                      "~/.rvm/bin"))
   (setenv "PATH" path))
+
+(setq dotfiles-dir (file-name-directory
+                    (or (buffer-file-name) load-file-name)))
+
+;; Don't add backup files everywhere
+(setq backup-directory-alist `(("." . ,(expand-file-name
+                                        (concat dotfiles-dir "backups")))))
+
+;; Avoid to write all the time yes/no
+(defalias 'yes-or-no-p 'y-or-n-p)

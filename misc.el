@@ -35,3 +35,9 @@
 
 ;; Avoid to write all the time yes/no
 (defalias 'yes-or-no-p 'y-or-n-p)
+
+;; SLIME
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
+;; Replace "sbcl" with the path to your implementation
+(setq inferior-lisp-program "/usr/local/bin/sbcl")
+(slime-setup '(slime-fancy))

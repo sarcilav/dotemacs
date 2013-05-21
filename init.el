@@ -28,11 +28,6 @@
 (require 'pretty-lambdada)
 (pretty-lambda-for-modes)
 
-;; SLIME
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
-;; Replace "sbcl" with the path to your implementation
-(setq inferior-lisp-program "sbcl")
-
 ;; Custom 'files'
 (load "personal.el")
 (load "face.el")

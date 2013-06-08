@@ -57,6 +57,5 @@ using.
 TODO
 ====
 
-* Add slime.
 * Add something for rails dev (rinari?).
 * Look into im, mailing, ... blogging options.

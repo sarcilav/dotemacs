@@ -33,5 +33,6 @@
 (load "face.el")
 (load "bindings.el")
 (load "modes.el")
+(load "hooks.el")
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)

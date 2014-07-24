@@ -1,4 +1,4 @@
-This is magit.info, produced by makeinfo version 4.8 from magit.texi.
+This is magit.info, produced by makeinfo version 4.13 from magit.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
@@ -221,18 +221,18 @@ the working tree and the staging area.  You can hide and show them as
 described in the previous section.
 
    The first section shows _Untracked files_, if there are any.  See
-*Note Untracked files:: for more details.
+*note Untracked files:: for more details.
 
    The next two sections show your local changes.  They are explained
-fully in the next chapter, *Note Staging and Committing::.
+fully in the next chapter, *note Staging and Committing::.
 
    If the current branch is associated with a remote tracking branch,
 the status buffer shows the differences between the current branch and
-the tracking branch.  See *Note Pushing and Pulling:: for more
+the tracking branch.  See *note Pushing and Pulling:: for more
 information.
 
    During a history rewriting session, the status buffer shows the
-_Pending changes_ and _Pending commits_ sections.  See *Note
+_Pending changes_ and _Pending commits_ sections.  See *note
 Rewriting:: for more details.
 
 
@@ -443,7 +443,7 @@ File: magit.info,  Node: Commit Buffer,  Next: Diffing,  Prev: Reflogs,  Up: Top
 ***************
 
 When you view a commit (perhaps by selecting it in the log buffer,
-*Note History::), the "commit buffer" is displayed, showing you
+*note History::), the "commit buffer" is displayed, showing you
 information about the commit and letting you interact with it.
 
    By placing your cursor within the diff or hunk and typing `a', you
@@ -597,7 +597,7 @@ HEAD or its upstream branch. Unless you type `b D', that is.  Here be
 dragons...
 
    Typing `b v' will list the local and remote branches in a new buffer
-called `*magit-branches*' from which you can work with them. See *Note
+called `*magit-branches*' from which you can work with them. See *note
 The Branch Manager:: for more details.
 
 
@@ -958,7 +958,7 @@ prefix by convention. So, creating a "t/foo" branch will actually
 populate the "Topics" section with one more branch after committing
 `.topdeps' and `.topmsg'.
 
-   Also, the way we pull (see *Note Pushing and Pulling::) such a
+   Also, the way we pull (see *note Pushing and Pulling::) such a
 branch is slightly different, since it requires updating the various
 dependencies of that branch. This should be mostly transparent, except
 in case of conflicts.
@@ -1212,7 +1212,6 @@ The following variables can be used to adapt Magit to your workflow:
      commits will be rewritten. This is magit's default behaviour,
      equivalent to `git rebase -i ${REV~1}'
 
-
        A'---B'---C'---D'
        ^
 
@@ -1220,7 +1219,6 @@ The following variables can be used to adapt Magit to your workflow:
      so only subsequent commits will be rewritten. This is consistent
      with git-rebase, equivalent to `git rebase -i ${REV}', yet more
      cumbersome to use from the status buffer.
-
 
        A---B'---C'---D'
        ^
@@ -1253,7 +1251,7 @@ File: magit.info,  Node: FAQ - Changes,  Next: FAQ 1 - Troubleshooting,  Up: Fre
    * v1.1: Changed the way extensions work. Previously, they were
      enabled unconditionally once the library was loaded. Now they are
      minor modes that need to be activated explicitly (potentially on a
-     per-repository basis). See *Note Activating extensions::.
+     per-repository basis). See *note Activating extensions::.
 
 
 
@@ -1317,43 +1315,48 @@ You can disable this with one of the following approaches:
 
 
 Tag Table:
-Node: Top639
-Node: Introduction1592
-Node: Acknowledgments3064
-Node: Sections3744
-Node: Status6294
-Node: Untracked files9033
-Node: Staging and Committing10237
-Node: History14135
-Node: Reflogs17315
-Node: Commit Buffer17719
-Node: Diffing19045
-Node: Tagging20032
-Node: Resetting20481
-Node: Stashing22005
-Node: Branching23063
-Node: The Branch Manager24441
-Node: Wazzup25157
-Node: Merging25948
-Node: Rebasing26998
-Node: Interactive Rebasing27824
-Node: Rewriting29116
-Node: Pushing and Pulling32141
-Node: Submodules34068
-Node: Bisecting34488
-Node: Using Magit Extensions35703
-Node: Activating extensions36000
-Node: Interfacing with Subversion37384
-Node: Interfacing with Topgit37982
-Node: Interfacing with StGit39010
-Node: Developing Extensions40008
-Node: Using Git Directly43786
-Node: Customization44157
-Node: Frequently Asked Questions48703
-Node: FAQ - Changes48934
-Node: FAQ 1 - Troubleshooting49342
-Node: FAQ 1-149590
-Node: FAQ 2 - Display issues49894
-Node: FAQ 2-150123
+Node: Top640
+Node: Introduction1593
+Node: Acknowledgments3065
+Node: Sections3745
+Node: Status6295
+Node: Untracked files9034
+Node: Staging and Committing10238
+Node: History14136
+Node: Reflogs17316
+Node: Commit Buffer17720
+Node: Diffing19046
+Node: Tagging20033
+Node: Resetting20482
+Node: Stashing22006
+Node: Branching23064
+Node: The Branch Manager24442
+Node: Wazzup25158
+Node: Merging25949
+Node: Rebasing26999
+Node: Interactive Rebasing27825
+Node: Rewriting29117
+Node: Pushing and Pulling32142
+Node: Submodules34069
+Node: Bisecting34489
+Node: Using Magit Extensions35704
+Node: Activating extensions36001
+Node: Interfacing with Subversion37385
+Node: Interfacing with Topgit37983
+Node: Interfacing with StGit39011
+Node: Developing Extensions40009
+Node: Using Git Directly43787
+Node: Customization44158
+Node: Frequently Asked Questions48702
+Node: FAQ - Changes48933
+Node: FAQ 1 - Troubleshooting49341
+Node: FAQ 1-149589
+Node: FAQ 2 - Display issues49893
+Node: FAQ 2-150122
 
 End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:

@@ -1,5 +1,5 @@
 
-(add-to-list 'load-path "~/.emacs.d")
+(add-to-list 'load-path "~/.emacs.d/personal/")
 
 (load "misc.el")
 (server-start)

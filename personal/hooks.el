@@ -8,3 +8,6 @@
     (setq tab-width 2)
     (setq standard-indent 2)
     (setq indent-tabs-mode nil)))
+
+;; Use fmt automagically
+(add-hook 'before-save-hook 'gofmt-before-save)

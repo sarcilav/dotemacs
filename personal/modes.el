@@ -12,8 +12,8 @@
 (add-to-list 'auto-mode-alist '("Gemfile$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.html$" . html-mode))
-(add-to-list 'auto-mode-alist '("\\.rhtml$" . rhtml-mode))
-(add-to-list 'auto-mode-alist '("\\.html.erb$" . rhtml-mode))
+(add-to-list 'auto-mode-alist '("\\.rhtml$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html.erb$" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.haml$" . haml-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown$" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
@@ -24,5 +24,5 @@
 (add-to-list 'auto-mode-alist '("\\.js\\.erb$" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.ru$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-(add-to-list 'auto-mode-alist '("\\.ejs$" . rhtml-mode))
+(add-to-list 'auto-mode-alist '("\\.ejs$" . web-mode))
 

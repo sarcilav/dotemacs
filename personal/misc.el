@@ -24,7 +24,8 @@
                      "/opt/X11/bin:"
                      "/usr/texbin:"
                      "~/.rvm/bin"))
-  (setenv "PATH" path))
+  (setenv "PATH" path)
+  (add-to-list 'exec-path "/usr/local/bin"))
 
 (setq dotfiles-dir (file-name-directory
                     (or (buffer-file-name) load-file-name)))

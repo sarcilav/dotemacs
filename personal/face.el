@@ -20,7 +20,7 @@
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 
 ;; Theme
-(load-theme 'wombat) ;; only works on emacs 24
+(load-theme 'leuven) ;; only works on emacs 24
 
 ;; no tabs
 (setq-default indent-tabs-mode nil)
@@ -43,3 +43,4 @@
 
 ;; Change coffee tabs to 2 spaces
 (custom-set-variables '(coffee-tab-width 2))
+

@@ -17,8 +17,13 @@
 ;; add marmalade
 (require 'package)
 (add-to-list 'package-archives
-             '("marmalade" .
-               "http://marmalade-repo.org/packages/"))
+             '("marmalade" . "http://marmalade-repo.org/packages/"))
+;; add melpa-stable
+(add-to-list 'package-archives             
+             '("melpa-stable" . "https://stable.melpa.org/packages/"))
+
+;; add cider to the pinned packages
+(add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
 (package-initialize)
 
 ;; Requiring elpa packages

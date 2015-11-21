@@ -20,7 +20,7 @@
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 
 ;; Theme
-(load-theme 'leuven) ;; only works on emacs 24
+(load-theme 'sanityinc-tomorrow-day) ;; only works on emacs 24
 
 ;; no tabs
 (setq-default indent-tabs-mode nil)

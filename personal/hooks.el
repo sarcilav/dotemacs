@@ -1,4 +1,8 @@
 (add-hook 'clojure-mode-hook 'paredit-mode)
+(add-hook 'clojure-mode-hook 'turn-on-pretty-mode)
+(add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'clojure-mode-hook 'rainbow-identifiers-mode)
+
 (add-hook 'nrepl-mode-hook 'paredit-mode)
 
 ;; Display spaces on go-mode as using 2 width spaces

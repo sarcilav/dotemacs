@@ -15,3 +15,6 @@
 
 ;; Use fmt automagically
 (add-hook 'before-save-hook 'gofmt-before-save)
+
+(add-hook 'term-mode-hook (lambda()
+                            (yas-minor-mode -1)))

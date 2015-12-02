@@ -14,10 +14,7 @@
       ido-max-prospects 10)
 
 
-;; add marmalade
 (require 'package)
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
 ;; add melpa-stable
 (add-to-list 'package-archives             
              '("melpa-stable" . "https://stable.melpa.org/packages/"))
@@ -51,10 +48,12 @@
 (pretty-lambda-for-modes)
 
 ;; Custom 'files'
+(require 'multi-term)
 (load "personal.el")
 (load "face.el")
 (load "bindings.el")
 (load "modes.el")
 (load "hooks.el")
+
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)

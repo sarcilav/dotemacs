@@ -17,4 +17,4 @@
 
 
 ;; multi term bindings
-(global-set-key "\C-c\C-t" 'multi-term)
+(global-set-key "\C-c\C-\M-t" 'multi-term)

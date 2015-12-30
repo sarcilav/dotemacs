@@ -18,3 +18,6 @@
 
 ;; multi term bindings
 (global-set-key "\C-c\C-\M-t" 'multi-term)
+
+;; replace ibuffer
+(global-set-key (kbd "C-x C-b") 'ibuffer)

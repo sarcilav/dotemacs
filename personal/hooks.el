@@ -16,5 +16,13 @@
 ;; Use fmt automagically
 (add-hook 'before-save-hook 'gofmt-before-save)
 
+;; remove yas from term, to avoid keybinding problems
 (add-hook 'term-mode-hook (lambda()
                             (yas-minor-mode -1)))
+
+;; filter by version control or by mode name
+(add-hook 'ibuffer-hook
+          (lambda ()
+            (ibuffer-vc-set-filter-groups-by-vc-root)
+            (unless (eq ibuffer-sorting-mode 'filename/process)
+              (ibuffer-do-sort-by-filename/process))))

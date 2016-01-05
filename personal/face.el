@@ -45,8 +45,9 @@
 (custom-set-variables '(coffee-tab-width 2))
 
 
-;;;; Ibuffer
+;; Ibuffer
 ;; Use human readable Size column instead of original one
+(require 'ibuffer)
 (define-ibuffer-column size-h
   (:name "Size" :inline t)
   (cond

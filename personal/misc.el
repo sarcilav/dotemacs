@@ -23,6 +23,7 @@
                      "/usr/local/bin:"
                      "/opt/X11/bin:"
                      "/usr/texbin:"
+                     "/Applications/Emacs.app/Contents/MacOS/bin:"
                      "~/.rvm/bin"))
   (setenv "PATH" path)
   (add-to-list 'exec-path "/usr/local/bin"))
@@ -42,3 +43,16 @@
 ;; Replace "sbcl" with the path to your implementation
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 (slime-setup '(slime-fancy))
+
+;; Ask to save *scratch*
+(defun try-to-save-*scratch*-and-exit ()
+  "Ask to savewhether or not to save *scratch*, and then close if y was pressed"
+  (interactive)
+  (when (y-or-n-p (format "Do you want to save *scratch*? "))
+    (switch-to-buffer "*scratch*")
+    (interactive)
+    (save-buffer))
+  (save-buffers-kill-emacs))
+
+(when window-system
+  (global-set-key (kbd "C-x C-c") 'try-to-save-*scratch*-and-exit))

@@ -491,7 +491,7 @@
 		((:url . "http://elpa.gnu.org/packages/memory-usage.html")
 		 (:keywords "maint"))])
  (metar .
-	[(0 1)
+	[(0 2)
 	 ((cl-lib
 	   (0 5)))
 	 "Retrieve and decode METAR weather information" single

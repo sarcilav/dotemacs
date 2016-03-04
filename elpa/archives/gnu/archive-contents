@@ -754,7 +754,7 @@
 		      ((:url . "http://elpa.gnu.org/packages/temp-buffer-browse.html")
 		       (:keywords "convenience"))])
  (test-simple .
-	      [(1 1)
+	      [(1 2 0)
 	       ((cl-lib
 		 (0)))
 	       "Simple Unit Test Framework for Emacs Lisp" single

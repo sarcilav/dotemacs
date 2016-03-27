@@ -57,6 +57,6 @@
 (load "bindings.el")
 (load "modes.el")
 (load "hooks.el")
-
+(load "clojure-refactor.el")
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)

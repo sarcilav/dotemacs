@@ -34,7 +34,7 @@
 
 ;; default window size
 (set-frame-height (selected-frame) 50)
-(set-frame-width (selected-frame) 140)
+(set-frame-width (selected-frame) 127)
 (set-frame-position (selected-frame) 0 0)
 
 ;; Change c indent to linux style

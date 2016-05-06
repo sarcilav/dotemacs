@@ -4,7 +4,7 @@
 (add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
 ;;;### (autoloads nil "rainbow-delimiters" "rainbow-delimiters.el"
-;;;;;;  (22095 15170 0 0))
+;;;;;;  (22316 62236 0 0))
 ;;; Generated autoloads from rainbow-delimiters.el
 
 (autoload 'rainbow-delimiters-mode "rainbow-delimiters" "\

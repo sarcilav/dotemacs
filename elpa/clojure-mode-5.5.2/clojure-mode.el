@@ -9,9 +9,9 @@
 ;;       Bozhidar Batsov <bozhidar@batsov.com>
 ;;       Artur Malabarba <bruce.connor.am@gmail.com>
 ;; URL: http://github.com/clojure-emacs/clojure-mode
-;; Package-Version: 5.5.1
+;; Package-Version: 5.5.2
 ;; Keywords: languages clojure clojurescript lisp
-;; Version: 5.5.1
+;; Version: 5.5.2
 ;; Package-Requires: ((emacs "24.3"))
 
 ;; This file is not part of GNU Emacs.
@@ -79,7 +79,7 @@
   :link '(url-link :tag "Github" "https://github.com/clojure-emacs/clojure-mode")
   :link '(emacs-commentary-link :tag "Commentary" "clojure-mode"))
 
-(defconst clojure-mode-version "5.5.1"
+(defconst clojure-mode-version "5.5.2"
   "The current version of `clojure-mode'.")
 
 (defface clojure-keyword-face
@@ -259,11 +259,11 @@ Out-of-the box clojure-mode understands lein, boot and gradle."
     (modify-syntax-entry ?\} "){" table)
     (modify-syntax-entry ?\[ "(]" table)
     (modify-syntax-entry ?\] ")[" table)
-    (modify-syntax-entry ?? "_ p" table) ; prefix outside of symbols
+    (modify-syntax-entry ?? "_ p" table) ; ? is a prefix outside symbols
+    (modify-syntax-entry ?# "_ p" table) ; # is allowed inside keywords (#399)
     (modify-syntax-entry ?~ "'" table)
     (modify-syntax-entry ?^ "'" table)
     (modify-syntax-entry ?@ "'" table)
-    (modify-syntax-entry ?# "'" table)
     table)
   "Syntax table for Clojure mode.
 Inherits from `emacs-lisp-mode-syntax-table'.")
@@ -751,7 +751,7 @@ highlighted region)."
   (setq font-lock-defaults
         '(clojure-font-lock-keywords    ; keywords
           nil nil
-          (("+-*/.<>=!?$%_&~^:@" . "w")) ; syntax alist
+          (("+-*/.<>=!?$%_&:" . "w")) ; syntax alist
           nil
           (font-lock-mark-block-function . mark-defun)
           (font-lock-syntactic-face-function

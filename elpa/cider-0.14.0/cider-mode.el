@@ -207,7 +207,8 @@ Configure `cider-cljs-lein-repl' to change the ClojureScript REPL to use."]
      :active (seq-remove #'null cider-ancillary-buffers)]
     ("nREPL" :active cider-connections
      ["Describe session" cider-describe-nrepl-session]
-     ["Close session" cider-close-nrepl-session]))
+     ["Close session" cider-close-nrepl-session]
+     ["Toggle message logging" nrepl-toggle-message-logging]))
   "Menu for CIDER mode")
 
 (defconst cider-mode-eval-menu
@@ -225,6 +226,7 @@ Configure `cider-cljs-lein-repl' to change the ClojureScript REPL to use."]
     ["Eval last sexp in popup buffer" cider-pprint-eval-last-sexp]
     ["Eval last sexp and replace" cider-eval-last-sexp-and-replace]
     ["Eval last sexp to REPL" cider-eval-last-sexp-to-repl]
+    ["Eval last sexp and pretty-print to REPL" cider-pprint-eval-last-sexp-to-repl]
     ["Insert last sexp in REPL" cider-insert-last-sexp-in-repl]
     ["Eval top-level sexp to comment" cider-eval-defun-to-comment]
     "--"

@@ -93,7 +93,7 @@ When set to nil the buffer will only be created."
   :group 'cider-repl)
 
 (defcustom cider-repl-scroll-on-output t
-  "Controls whether the REPL buffer auto-scolls on new output.
+  "Controls whether the REPL buffer auto-scrolls on new output.
 
 When set to t (the default), if the REPL buffer contains more lines than the
 size of the window, the buffer is automatically re-centered upon completion
@@ -309,9 +309,9 @@ client process connection.  Unless NO-BANNER is non-nil, insert a banner."
   "Generate the help banner."
   (substitute-command-keys
    "\n;; ======================================================================
-;; If you’re new to CIDER it is highly recommended to go through its
+;; If you're new to CIDER it is highly recommended to go through its
 ;; manual first. Type <M-x cider-view-manual> to view it.
-;; In case you’re seeing any warnings you should consult the manual’s
+;; In case you're seeing any warnings you should consult the manual's
 ;; \"Troubleshooting\" section.
 ;;
 ;; Here are few tips to get you started:
@@ -328,13 +328,13 @@ client process connection.  Unless NO-BANNER is non-nil, insert a banner."
 ;; * Print CIDER's refcard and keep it close to your keyboard.
 ;;
 ;; CIDER is super customizable - try <M-x customize-group cider> to
-;; get a feel for this. If you’re thirsty for knowledge you should try
+;; get a feel for this. If you're thirsty for knowledge you should try
 ;; <M-x cider-drink-a-sip>.
 ;;
-;; If you think you’ve encountered a bug (or have some suggestions for
+;; If you think you've encountered a bug (or have some suggestions for
 ;; improvements) use <M-x cider-report-bug> to report it.
 ;;
-;; Above all else - don’t panic! In case of an emergency - procure
+;; Above all else - don't panic! In case of an emergency - procure
 ;; some (hard) cider and enjoy it responsibly!
 ;;
 ;; You can remove this message with the `cider-repl-clear-help-banner' command.
@@ -527,7 +527,7 @@ Return the position of the prompt beginning."
         prompt-start))))
 
 (defun cider-repl--flush-ansi-color-context ()
-  "Flush ansi color context after printing.  
+  "Flush ansi color context after printing.
 When there is a possible unfinished ansi control sequence,
  `ansi-color-context` maintains this list."
   (when (and ansi-color-context (stringp (cadr ansi-color-context)))
@@ -776,8 +776,8 @@ text property `cider-old-input'."
     (narrow-to-region cider-repl-input-start-mark (point))
     (let ((matching-delimiter nil))
       (while (ignore-errors (save-excursion
-			      (backward-up-list 1)
-			      (setq matching-delimiter (cdr (syntax-after (point))))) t)
+                              (backward-up-list 1)
+                              (setq matching-delimiter (cdr (syntax-after (point))))) t)
         (insert-char matching-delimiter))))
   (cider-repl-return))
 

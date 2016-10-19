@@ -1136,6 +1136,20 @@ If invoked with a PREFIX argument, switch to the REPL buffer."
   (when prefix
     (cider-switch-to-repl-buffer)))
 
+(defun cider-pprint-eval-last-sexp-to-repl (&optional prefix)
+  "Evaluate the expression preceding point and insert its pretty-printed result in the REPL.
+If invoked with a PREFIX argument, switch to the REPL buffer."
+  (interactive "P")
+  (let* ((conn-buffer (cider-current-connection))
+         (right-margin (max fill-column
+                            (1- (window-width (get-buffer-window conn-buffer))))))
+    (cider-interactive-eval nil
+                            (cider-insert-eval-handler conn-buffer)
+                            (cider-last-sexp 'bounds)
+                            (cider--nrepl-pprint-request-plist (or right-margin fill-column))))
+  (when prefix
+    (cider-switch-to-repl-buffer)))
+
 (defun cider-eval-print-last-sexp ()
   "Evaluate the expression preceding point.
 Print its value into the current buffer."
@@ -1433,6 +1447,9 @@ Defaults to the current ns.  With prefix arg QUERY, prompts for a ns."
 
        ((member "invoked-before" status)
         (log-echo (format "Successfully called %s\n" before) 'font-lock-string-face))
+
+       ((member "invoked-not-resolved" status)
+        (log-echo "Could not resolve refresh function\n" 'font-lock-string-face))
 
        (reloading
         (log-echo (format "Reloading %s\n" reloading) 'font-lock-string-face))

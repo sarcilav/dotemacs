@@ -1,13 +1,14 @@
-;;; inflections.el --- convert english words between singular and plural
+;;; inflections.el --- convert english words between singular and plural  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2006 Dmitry Galinsky <dima dot exe at gmail dot com>
 
 ;; Author: Dmitry Galinsky, Howard Yeh
 ;; URL: https://github.com/eschulte/jump.el
-;; Package-Version: 2.3
+;; Package-Version: 2.4
+;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
 ;; Version: 1.1
 ;; Created: 2007-11-02
-;; Keywords: ruby rails languages oop
+;; Keywords: languages, tools, wp
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -28,7 +29,7 @@
 ;; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 ;;; Code:
-(require 'cl)
+(require 'cl-lib)
 
 (defvar inflection-singulars    nil)
 (defvar inflection-plurals      nil)
@@ -37,32 +38,31 @@
 
 (defmacro define-inflectors (&rest specs)
   (cons 'progn
-        (loop for (type . rest) in specs
-              collect (case type
-                        (:singular `(push (quote ,rest) inflection-singulars))
-                        (:plural `(push (quote ,rest) inflection-plurals))
-                        (:irregular `(push (quote ,rest) inflection-irregulars))
-                        (:uncountable `(setf inflection-uncountables
-                                             (append (quote ,rest) inflection-uncountables)))))))
+        (cl-loop for (type . rest) in specs
+                 collect (cl-case type
+                           (:singular `(push (quote ,rest) inflection-singulars))
+                           (:plural `(push (quote ,rest) inflection-plurals))
+                           (:irregular `(push (quote ,rest) inflection-irregulars))
+                           (:uncountable `(setf inflection-uncountables
+                                                (append (quote ,rest) inflection-uncountables)))))))
 
-(defmacro string=~ (regex string &rest body)
-  "regex matching similar to the =~ operator found in other languages."
+(defmacro inflection--string=~ (regex string &rest body)
+  "Regex matching similar to the =~ operator found in other languages."
   (let ((str (gensym)))
-    `(lexical-let ((,str ,string))
-       ;; Use lexical-let to make closures (in flet).
+    `(let ((,str ,string))
        (when (string-match ,regex ,str)
-         (symbol-macrolet ,(loop for i to 9 collect
-                                 (let ((sym (intern (concat "$" (number-to-string i)))))
-                                   `(,sym (match-string ,i ,str))))
-           (flet (($ (i) (match-string i ,str))
-                  (sub (replacement &optional (i 0) &key fixedcase literal-string)
-                       (replace-match replacement fixedcase literal-string ,str i)))
-             (symbol-macrolet ( ;;before
-                               ($b (substring ,str 0 (match-beginning 0)))
-                               ;;match
-                               ($m (match-string 0 ,str))
-                               ;;after
-                               ($a (substring ,str (match-end 0) (length ,str))))
+         (cl-symbol-macrolet ,(cl-loop for i to 9 collect
+                                       (let ((sym (intern (concat "$" (number-to-string i)))))
+                                         `(,sym (match-string ,i ,str))))
+           (cl-flet (($ (i) (match-string i ,str))
+                     (sub (replacement &optional (i 0) &key fixedcase literal-string)
+                          (replace-match replacement fixedcase literal-string ,str i)))
+             (cl-symbol-macrolet ( ;;before
+                                  ($b (substring ,str 0 (match-beginning 0)))
+                                  ;;match
+                                  ($m (match-string 0 ,str))
+                                  ;;after
+                                  ($a (substring ,str (match-end 0) (length ,str))))
                ,@body)))))))
 
 (define-inflectors
@@ -131,28 +131,32 @@
   (:uncountable "equipment" "information" "rice" "money" "species" "series" "fish" "sheep" "news"))
 
 ;;;###autoload
-(defun singularize-string (str)
+(defun inflection-singularize-string (str)
+  "Return the singularized version of STR."
   (when (stringp str)
     (or (car (member str inflection-uncountables))
         (caar (member* (downcase str) inflection-irregulars :key 'cadr :test 'equal))
-        (loop for (from to) in inflection-singulars
-              for singular = (string=~ from str (sub to))
-              when singular do (return singular))
+        (cl-loop for (from to) in inflection-singulars
+                 for singular = (inflection--string=~ from str (sub to))
+                 when singular do (return singular))
         str)))
 
 ;;;###autoload
-(defun pluralize-string (str)
+(define-obsolete-function-alias 'singularize-string 'inflection-singularize-string)
+
+;;;###autoload
+(defun inflection-pluralize-string (str)
+  "Return the pluralized version of STR."
   (when (stringp str)
     (or (car (member str inflection-uncountables))
         (cadar (member* (downcase str) inflection-irregulars :key 'car :test 'equal))
-        (loop for (from to) in inflection-plurals
-              for plurals = (string=~ from str (sub to))
-              when plurals do (return plurals))
+        (cl-loop for (from to) in inflection-plurals
+                 for plurals = (inflection--string=~ from str (sub to))
+                 when plurals do (return plurals))
         str)))
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
+;;;###autoload
+(define-obsolete-function-alias 'pluralize-string 'inflection-pluralize-string)
 
 (provide 'inflections)
 ;;; inflections.el ends here

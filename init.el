@@ -39,6 +39,9 @@
  '(magit-log-arguments (quote ("--graph" "--color" "--decorate" "-n256")))
  '(magit-notes-arguments nil)
  '(magit-push-arguments (quote ("--set-upstream")))
+ '(package-selected-packages
+   (quote
+    (yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada php-mode markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe)))
  '(safe-local-variable-values (quote ((encoding . utf-8)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -57,6 +60,5 @@
 (load "bindings.el")
 (load "modes.el")
 (load "hooks.el")
-(load "clojure-refactor.el")
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)

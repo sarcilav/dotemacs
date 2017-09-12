@@ -7,7 +7,7 @@ Compiling emacs for OS X
 ========================
 
 Note: This works for GNU Emacs 24.3.50.1 (x86_64-apple-darwin12.3.0,
-NS apple-appkit-1187.37) on 2013-03-25.
+NS apple-appkit-1187.37) on 2016-10-27.
 
 The idea was heavily inspired by a
 [serie of posts](http://devblog.avdi.org/category/emacs-reboot/page/2/)
@@ -15,12 +15,13 @@ from @avdi's blog, that were on my reading list for so long.
 
 The first step is to download it!
 
-	$ ﻿bzr branch bzr://bzr.savannah.gnu.org/emacs/trunk emacs
+	$ ﻿git clone -b master git://git.sv.gnu.org/emacs.git
 
 Then you need to run the `autogen.sh` and the `configure` scripts
 
 	cd emacs
 	./autogen.sh
+	./autogen.sh git
 	./configure --with-ns`
 
 Note: The `--with-ns` flag is to use NeXTstep (Cocoa or GNUstep) windowing system

@@ -4,6 +4,7 @@
 
 ;; Author: Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; URL: https://github.com/lunaryorn/pkg-info.el
+;; Package-Version: 0.6
 ;; Keywords: convenience
 ;; Version: 0.6
 ;; Package-Requires: ((epl "0.8"))

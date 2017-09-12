@@ -41,7 +41,7 @@
  '(magit-push-arguments (quote ("--set-upstream")))
  '(package-selected-packages
    (quote
-    (yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada php-mode markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe)))
+    (erlang paredit yasnippet cider yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada php-mode markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe)))
  '(safe-local-variable-values (quote ((encoding . utf-8)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

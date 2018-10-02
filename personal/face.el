@@ -44,6 +44,8 @@
 ;; Change coffee tabs to 2 spaces
 (custom-set-variables '(coffee-tab-width 2))
 
+;; change js indent
+(setq js-indent-level 2)
 
 ;; Ibuffer
 ;; Use human readable Size column instead of original one

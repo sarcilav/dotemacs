@@ -13,14 +13,14 @@
 
 ;; nice fonts in OS X
 (setq mac-allow-anti-aliasing t)
-(set-default-font "-apple-inconsolata-medium-r-normal--0-0-0-0-m-0-iso10646-1")
+(set-frame-font "-apple-inconsolata-medium-r-normal--0-0-0-0-m-0-iso10646-1")
 (set-face-attribute 'default nil :height 180)
 
 ;; interpret and use ansi color codes in shell output windows
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 
 ;; Theme
-(load-theme 'sanityinc-tomorrow-day) ;; only works on emacs 24
+(load-theme 'misterioso) ;; only works on emacs 24
 
 ;; no tabs
 (setq-default indent-tabs-mode nil)

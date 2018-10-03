@@ -15,6 +15,9 @@
 (global-set-key "\C-s" 'isearch-forward-regexp)
 (global-set-key "\C-r" 'isearch-backward-regexp)
 
+;; Use ag-project-regexp for searching in files
+(global-set-key "\M-s\M-s" 'ag-project-regexp)
+
 
 ;; multi term bindings
 (global-set-key "\C-c\C-\M-t" 'multi-term)

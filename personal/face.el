@@ -21,7 +21,7 @@
 
 ;; Theme
 (load-theme 'misterioso) ;; only works on emacs 24
-
+(set-cursor-color "#e47133")
 ;; no tabs
 (setq-default indent-tabs-mode nil)
 

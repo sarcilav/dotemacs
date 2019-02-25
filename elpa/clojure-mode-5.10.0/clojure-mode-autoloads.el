@@ -3,8 +3,8 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "clojure-mode" "clojure-mode.el" (23475 13248
-;;;;;;  688297 871000))
+;;;### (autoloads nil "clojure-mode" "clojure-mode.el" (23667 47323
+;;;;;;  180613 322000))
 ;;; Generated autoloads from clojure-mode.el
 
 (autoload 'clojure-mode "clojure-mode" "\
@@ -91,7 +91,8 @@ Change a surrounding when to when-not, or vice-versa.
 
 (autoload 'clojure-let-backward-slurp-sexp "clojure-mode" "\
 Slurp the s-expression before the let form into the let form.
-With a numberic prefix argument slurp the previous N s-expression into the let form.
+With a numberic prefix argument slurp the previous N s-expression
+into the let form.
 
 \(fn &optional N)" t nil)
 

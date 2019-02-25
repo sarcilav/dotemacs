@@ -3,7 +3,7 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "sesman" "sesman.el" (23557 18632 657281 20000))
+;;;### (autoloads nil "sesman" "sesman.el" (23667 47300 777797 0))
 ;;; Generated autoloads from sesman.el
 
 (autoload 'sesman-start "sesman" "\
@@ -74,8 +74,8 @@ Break any of the previously created links.
 
 ;;;***
 
-;;;### (autoloads nil "sesman-browser" "sesman-browser.el" (23557
-;;;;;;  18632 658494 608000))
+;;;### (autoloads nil "sesman-browser" "sesman-browser.el" (23667
+;;;;;;  47300 775821 413000))
 ;;; Generated autoloads from sesman-browser.el
 
 (autoload 'sesman-browser "sesman-browser" "\
@@ -86,7 +86,7 @@ See `sesman-browser-mode' for more details.
 
 ;;;***
 
-;;;### (autoloads nil nil ("sesman-pkg.el") (23557 18632 655990 898000))
+;;;### (autoloads nil nil ("sesman-pkg.el") (23667 47300 772367 743000))
 
 ;;;***
 

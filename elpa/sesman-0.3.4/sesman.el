@@ -4,7 +4,7 @@
 ;; Author: Vitalie Spinu
 ;; URL: https://github.com/vspinu/sesman
 ;; Keywords: process
-;; Version: 0.3.2
+;; Version: 0.3.3-DEV
 ;; Package-Requires: ((emacs "25"))
 ;; Keywords: processes, tools, vc
 ;;
@@ -42,6 +42,7 @@
 (require 'cl-generic)
 (require 'seq)
 (require 'subr-x)
+(require 'vc)
 
 (defgroup sesman nil
   "Generic Session Manager."
@@ -65,12 +66,23 @@
   :group 'sesman)
 
 (defcustom sesman-use-friendly-sessions t
-  "If non-nil consider friendly sessions when searching for the current sessions.
+  "If non-nil consider friendly sessions when looking for current sessions.
 The definition of friendly sessions is system dependent but usually means
 sessions running in dependent projects."
   :group 'sesman
   :type 'boolean
   :package-version '(sesman . "0.3.2"))
+
+(defcustom sesman-follow-symlinks 'vc
+  "When non-nil, follow symlinks during the file expansion.
+When nil, don't follow symlinks. When 'vc, follow symlinks only when
+`vc-follow-symlinks' is non-nil. When t, always follow symlinks."
+  :group 'sesman
+  :type '(choice (const :tag "Comply with `vc-follow-symlinks'" vc)
+                 (const :tag "Don't follow symlinks"   nil)
+                 (const :tag "Follow symlinks"         t))
+  :package-version '(sesman . "0.3.3"))
+(put 'sesman-follow-symlinks 'safe-local-variable (lambda (x) (memq x '(vc nil t))))
 
 ;; (defcustom sesman-disambiguate-by-relevance t
 ;;   "If t choose most relevant session in ambiguous situations, otherwise ask.
@@ -167,11 +179,6 @@ Can be either a symbol, or a function returning a symbol.")
         (error (format "%s association not allowed for this system (%s)"
                        (capitalize cxt-name)
                        system))))))
-
-(defun sesman--expand-path-maybe (obj)
-  (if (stringp obj)
-      (expand-file-name obj)
-    obj))
 
 ;; FIXME: incorporate `sesman-abbreviate-paths'
 (defun sesman--abbrev-path-maybe (obj)
@@ -445,7 +452,7 @@ PROJECT defaults to current project. On universal argument, or if PROJECT is
                      (or project (sesman-project system))))))
     (sesman--link-session-interactively session 'project project)))
 
- ;;;###autoload
+;;;###autoload
 (defun sesman-link-with-least-specific (&optional session)
   "Ask for SESSION and link with the least specific context available.
 Normally the least specific context is the project. If not in a project, link
@@ -543,9 +550,8 @@ instead."
   (list :objects (cdr session)))
 
 (cl-defgeneric sesman-project (_system)
-  "Retrieve project root for SYSTEM in directory DIR.
-DIR defaults to `default-directory'. Return a string or nil if no project has
-been found."
+  "Retrieve project root in current directory (`default-directory') for SYSTEM.
+Return a string or nil if no project has been found."
   nil)
 
 (cl-defgeneric sesman-more-relevant-p (_system session1 session2)
@@ -744,13 +750,15 @@ context. If CXT-TYPE is non-nil, and CXT-VAL is not given, retrieve it with
   (let* ((ses-name (or (car-safe session)
                        (error "SESSION must be a headed list")))
          (cxt-val (or cxt-val
-                      (sesman--expand-path-maybe
-                       (or (if cxt-type
-                               (sesman-context cxt-type system)
-                             (let ((cxt (sesman--least-specific-context system)))
-                               (setq cxt-type (car cxt))
-                               (cdr cxt)))
-                           (error "No local context of type %s" cxt-type)))))
+                      (or (if cxt-type
+                              (sesman-context cxt-type system)
+                            (let ((cxt (sesman--least-specific-context system)))
+                              (setq cxt-type (car cxt))
+                              (cdr cxt)))
+                          (error "No local context of type %s" cxt-type))))
+         (cxt-val (if (stringp cxt-val)
+                      (expand-file-name cxt-val)
+                    cxt-val))
          (key (cons system ses-name))
          (link (list key cxt-type cxt-val)))
     (if (member cxt-type sesman-single-link-context-types)
@@ -913,14 +921,24 @@ buffers."
                           -1)))
                     (buffer-list)))))
 
+;; path caching because file-truename is very slow
+(defvar sesman--path-cache (make-hash-table :test #'equal))
+(defun sesman-expand-path (path)
+  "Expand PATH with optionally follow symlinks.
+Whether symlinks are followed is controlled by `sesman-follow-symlinks' custom
+variable."
+  (if sesman-follow-symlinks
+      (let ((true-name (or (gethash path sesman--path-cache)
+                           (puthash path (file-truename path) sesman--path-cache))))
+        (if (or (eq sesman-follow-symlinks t)
+                vc-follow-symlinks)
+            true-name
+          ;; sesman-follow-symlinks is 'vc but vc-follow-symlinks is nil
+          (expand-file-name path)))
+    (expand-file-name path)))
+
 
 ;;; Contexts
-
-(defvar sesman--path-cache (make-hash-table :test #'equal))
-;; path caching because file-truename is very slow
-(defun sesman--expand-path (path)
-  (or (gethash path sesman--path-cache)
-      (puthash path (file-truename path) sesman--path-cache)))
 
 (cl-defgeneric sesman-context (_cxt-type _system)
   "Given SYSTEM and context type CXT-TYPE return the context.")
@@ -929,18 +947,20 @@ buffers."
   (current-buffer))
 (cl-defmethod sesman-context ((_cxt-type (eql directory)) _system)
   "Return current directory."
-  (sesman--expand-path default-directory))
+  (sesman-expand-path default-directory))
 (cl-defmethod sesman-context ((_cxt-type (eql project)) system)
   "Return current project."
-  (let ((proj (or
-               (sesman-project (or system (sesman--system)))
-               ;; Normally we would use (project-roots (project-current)) but currently
-               ;; project-roots fails on nil and doesn't work on custom `('foo .
-               ;; "path/to/project"). So, use vc as a fallback and don't use project.el at
-               ;; all for now.
-               (vc-root-dir))))
+  (let* ((default-directory (sesman-expand-path default-directory))
+         (proj (or
+                (sesman-project (or system (sesman--system)))
+                ;; Normally we would use (project-roots (project-current)) but currently
+                ;; project-roots fails on nil and doesn't work on custom `('foo .
+                ;; "path/to/project"). So, use vc as a fallback and don't use project.el at
+                ;; all for now.
+                ;; NB: `vc-root-dir' doesn't work from symlinked files. Emacs Bug?
+                (vc-root-dir))))
     (when proj
-      (sesman--expand-path proj))))
+      (expand-file-name proj))))
 
 (cl-defgeneric sesman-relevant-context-p (_cxt-type cxt)
   "Non-nil if context CXT is relevant to current context of type CXT-TYPE.")
@@ -950,13 +970,13 @@ buffers."
 (cl-defmethod sesman-relevant-context-p ((_cxt-type (eql directory)) dir)
   "Non-nil if DIR is the parent or equals the `default-directory'."
   (when (and dir default-directory)
-    (string-match-p (concat "^" (sesman--expand-path dir))
-                    (sesman--expand-path default-directory))))
+    (string-match-p (concat "^" (sesman-expand-path dir))
+                    (sesman-expand-path default-directory))))
 (cl-defmethod sesman-relevant-context-p ((_cxt-type (eql project)) proj)
   "Non-nil if PROJ is the parent or equal to the `default-directory'."
   (when (and proj default-directory)
-    (string-match-p (concat "^" (sesman--expand-path proj))
-                    (sesman--expand-path default-directory))))
+    (string-match-p (concat "^" (sesman-expand-path proj))
+                    (sesman-expand-path default-directory))))
 
 (defun sesman-relevant-link-p (link &optional cxt-types)
   "Return non-nil if LINK is relevant to the current context.

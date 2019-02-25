@@ -1,21 +1,22 @@
 ;;; php-mode.el --- Major mode for editing PHP code
 
+;; Copyright (C) 2018-2019  Friends of Emacs-PHP development
 ;; Copyright (C) 1999, 2000, 2001, 2003, 2004 Turadg Aleahmad
 ;;               2008 Aaron S. Hawley
 ;;               2011, 2012, 2013, 2014, 2015, 2016, 2017 Eric James Michael Ritz
 
 ;; Author: Eric James Michael Ritz
 ;; Maintainer: USAMI Kenta <tadsan@zonu.me>
-;; URL: https://github.com/ejmr/php-mode
+;; URL: https://github.com/emacs-php/php-mode
 ;; Keywords: languages php
-;; Version: 1.19.1
-;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
+;; Version: 1.21.0
+;; Package-Requires: ((emacs "24.3") (cl-lib "0.5"))
 ;; License: GPL-3.0-or-later
 
-(defconst php-mode-version-number "1.19.1"
+(defconst php-mode-version-number "1.21.0"
   "PHP Mode version number.")
 
-(defconst php-mode-modified "2018-05-12"
+(defconst php-mode-modified "2019-01-09"
   "PHP Mode build date.")
 
 ;; This file is free software; you can redistribute it and/or
@@ -92,6 +93,7 @@
 
 (eval-when-compile
   (require 'regexp-opt)
+  (autoload 'pkg-info-version-info "pkg-info")
   (defvar c-vsemi-status-unknown-p)
   (defvar syntax-propertize-via-font-lock))
 
@@ -101,7 +103,7 @@
   (if (and (= emacs-major-version 24) (>= emacs-minor-version 4))
     (require 'cl)))
 
-;; Work around https://github.com/ejmr/php-mode/issues/310.
+;; Work around https://github.com/emacs-php/php-mode/issues/310.
 ;;
 ;; In emacs 24.4 and 24.5, lines after functions with a return type
 ;; are incorrectly analyzed as member-init-cont.
@@ -122,25 +124,39 @@
 ;; Local variables
 ;;;###autoload
 (defgroup php nil
-  "Major mode for editing PHP code."
+  "Language support for PHP."
   :tag "PHP"
-  :prefix "php-"
   :group 'languages
-  :link '(url-link :tag "Official Site" "https://github.com/ejmr/php-mode")
-  :link '(url-link :tag "PHP Mode Wiki" "https://github.com/ejmr/php-mode/wiki"))
+  :group 'php
+  :link '(url-link :tag "Official Site" "https://github.com/emacs-php/php-mode")
+  :link '(url-link :tag "PHP Mode Wiki" "https://github.com/emacs-php/php-mode/wiki"))
+
+;;;###autoload
+(defgroup php-mode nil
+  "Major mode for editing PHP code."
+  :tag "PHP Mode"
+  :prefix "php-mode-"
+  :group 'languages
+  :group 'php
+  :link '(url-link :tag "Official Site" "https://github.com/emacs-php/php-mode")
+  :link '(url-link :tag "PHP Mode Wiki" "https://github.com/emacs-php/php-mode/wiki"))
 
 (defcustom php-executable (or (executable-find "php")
                               "/usr/bin/php")
   "The location of the PHP executable."
   :type 'string)
 
-(defcustom php-default-face 'default
+(define-obsolete-variable-alias 'php-default-face 'php-mode-default-face "1.20.0")
+(defcustom php-mode-default-face 'default
   "Default face in `php-mode' buffers."
+  :group 'php-mode
   :type 'face)
 
-(defcustom php-speedbar-config t
+(define-obsolete-variable-alias 'php-speedbar-config 'php-mode-speedbar-config "1.20.0")
+(defcustom php-mode-speedbar-config t
   "When set to true automatically configures Speedbar to observe PHP files.
 Ignores php-file patterns option; fixed to expression \"\\.\\(inc\\|php[s345]?\\)\""
+  :group 'php-mode
   :type 'boolean
   :set (lambda (sym val)
          (set-default sym val)
@@ -151,14 +167,17 @@ Ignores php-file patterns option; fixed to expression \"\\.\\(inc\\|php[s345]?\\
 (defcustom php-mode-speedbar-open nil
   "Normally `php-mode' starts with the speedbar closed.
 Turning this on will open it whenever `php-mode' is loaded."
+  :group 'php-mode
   :type 'boolean
   :set (lambda (sym val)
          (set-default sym val)
          (when val
-             (speedbar 1))))
+           (speedbar 1))))
 
-(defcustom php-template-compatibility t
+(define-obsolete-variable-alias 'php-template-compatibility 'php-mode-template-compatibility "1.20.0")
+(defcustom php-mode-template-compatibility t
   "Should detect presence of html tags."
+  :group 'php-mode
   :type 'boolean)
 
 (defsubst php-in-string-p ()
@@ -170,7 +189,7 @@ Turning this on will open it whenever `php-mode' is loaded."
 (defsubst php-in-string-or-comment-p ()
   (nth 8 (syntax-ppss)))
 
-(defun php-mode-extra-constants-create-regexp(kwds)
+(defun php-mode-extra-constants-create-regexp (kwds)
   "Create regexp for the list of extra constant keywords KWDS."
    (concat "[^_$]?\\<\\("
            (regexp-opt
@@ -178,7 +197,7 @@ Turning this on will open it whenever `php-mode' is loaded."
                      (when (boundp 'web-mode-extra-php-constants) web-mode-extra-php-constants)))
            "\\)\\>[^_]?"))
 
-(defun php-mode-extra-constants-set(sym value)
+(defun php-mode-extra-constants-set (sym value)
   "Apply the list of extra constant keywords `VALUE'.
 
 This function is called when the custom variable php-extra-constants
@@ -194,14 +213,18 @@ of constants when set."
      'php-mode `((,(php-mode-extra-constants-create-regexp value) 1 'php-constant))))
   (set sym value))
 
-(defcustom php-lineup-cascaded-calls nil
+(define-obsolete-variable-alias 'php-lineup-cascaded-calls 'php-mode-lineup-cascaded-calls "1.20.0")
+(defcustom php-mode-lineup-cascaded-calls nil
   "Indent chained method calls to the previous line."
+  :group 'php-mode
   :type 'boolean)
 
-;;;###autoload
-(defcustom php-extra-constants '()
+
+(define-obsolete-variable-alias 'php-extra-constants 'php-mode-extra-constants "1.20.0")
+(defcustom php-mode-extra-constants '()
   "A list of additional strings to treat as PHP constants."
-  :type 'list
+  :group 'php-mode
+  :type '(repeat string)
   :set 'php-mode-extra-constants-set)
 
 (defun php-create-regexp-for-method (visibility)
@@ -265,10 +288,11 @@ can be used to match against definitions for that classlike."
     "^\\s-*function\\s-+\\(\\(?:\\sw\\|\\s_\\)+\\)\\s-*(" 1))
   "Imenu generic expression for PHP Mode.  See `imenu-generic-expression'.")
 
-(defcustom php-do-not-use-semantic-imenu t
+(define-obsolete-variable-alias 'php-do-not-use-semantic-imenu 'php-mode-do-not-use-semantic-imenu "1.20.0")
+(defcustom php-mode-do-not-use-semantic-imenu t
   "Customize `imenu-create-index-function' for `php-mode'.
 
-If using `semantic-mode' `imenu-create-index-function' will be
+If using function `semantic-mode' `imenu-create-index-function' will be
 set to `semantic-create-imenu-index' due to `c-mode' being its
 parent.  Set this variable to t if you want to use
 `imenu-default-create-index-function' even with `semantic-mode'
@@ -394,6 +418,12 @@ This function may interfere with other hooks and other behaviors.
 In that case set to `NIL'."
   :type 'boolean)
 
+(define-obsolete-variable-alias 'php-mode-disable-parent-mode-hooks 'php-mode-disable-c-mode-hook "1.21.0")
+(defcustom php-mode-disable-c-mode-hook t
+  "When set to `T', do not run hooks of parent modes (`java-mode', `c-mode')."
+  :type 'boolean
+  :group 'php-mode)
+
 (defun php-mode-version ()
   "Display string describing the version of PHP Mode."
   (interactive)
@@ -405,9 +435,9 @@ In that case set to `NIL'."
 (define-obsolete-variable-alias 'php-available-project-root-files 'php-project-available-root-files "1.19.0")
 
 (defvar php-mode-map
-  (let ((map (make-sparse-keymap)))
-    ;; (define-key map [menu-bar php]
-    ;;   (cons "PHP" (make-sparse-keymap "PHP")))
+  (let ((map (make-sparse-keymap "PHP Mode")))
+    ;; Remove menu item for c-mode
+    (define-key map [menu-bar C] nil)
 
     ;; (define-key map [menu-bar php complete-function]
     ;;   '("Complete function name" . php-complete-function))
@@ -1014,7 +1044,7 @@ this ^ lineup"
 (defgroup php-faces nil
   "Faces used in PHP Mode"
   :tag "PHP Faces"
-  :group 'php
+  :group 'php-mode
   :group 'faces)
 
 (defface php-string '((t (:inherit font-lock-string-face)))
@@ -1107,8 +1137,7 @@ this ^ lineup"
 
 (define-obsolete-face-alias 'php-annotations-annotation-face 'php-doc-annotation-tag "1.19.0")
 
-(defvar php-mode--delayed-set-style nil)
-(make-variable-buffer-local 'php-mode--delayed-set-style)
+(defvar-local php-mode--delayed-set-style nil)
 
 (defun php-set-style (stylename &optional dont-override)
   "Set the current `php-mode' buffer to use the style STYLENAME.
@@ -1191,7 +1220,7 @@ After setting the stylevars run hooks according to STYLENAME
   (require 'pkg-info nil t)
   (php-mode-debug--buffer 'init)
   (php-mode-debug--message "Feel free to report on GitHub what you noticed!")
-  (php-mode-debug--message "https://github.com/ejmr/php-mode/issues/new")
+  (php-mode-debug--message "https://github.com/emacs-php/php-mode/issues/new")
   (php-mode-debug--message "")
   (php-mode-debug--message "Pasting the following information on the issue will help us to investigate the cause.")
   (php-mode-debug--message "```")
@@ -1235,18 +1264,22 @@ After setting the stylevars run hooks according to STYLENAME
   "Major mode for editing PHP code.
 
 \\{php-mode-map}"
-
+  ;; :after-hook (c-update-modeline)
+  ;; (setq abbrev-mode t)
+  (when php-mode-disable-c-mode-hook
+    (setq-local c-mode-hook nil)
+    (setq-local java-mode-hook nil))
   (c-initialize-cc-mode t)
   (c-init-language-vars php-mode)
   (c-common-init 'php-mode)
 
-  (set (make-local-variable 'font-lock-string-face) 'php-string)
-  (set (make-local-variable 'font-lock-keyword-face) 'php-keyword)
-  (set (make-local-variable 'font-lock-builtin-face) 'php-builtin)
-  (set (make-local-variable 'c-preprocessor-face-name) 'php-php-tag)
-  (set (make-local-variable 'font-lock-function-name-face) 'php-function-name)
-  (set (make-local-variable 'font-lock-variable-name-face) 'php-variable-name)
-  (set (make-local-variable 'font-lock-constant-face) 'php-constant)
+  (setq-local font-lock-string-face 'php-string)
+  (setq-local font-lock-keyword-face 'php-keyword)
+  (setq-local font-lock-builtin-face 'php-builtin)
+  (setq-local c-preprocessor-face-name 'php-php-tag)
+  (setq-local font-lock-function-name-face 'php-function-name)
+  (setq-local font-lock-variable-name-face 'php-variable-name)
+  (setq-local font-lock-constant-face 'php-constant)
 
   (modify-syntax-entry ?_    "_" php-mode-syntax-table)
   (modify-syntax-entry ?`    "\"" php-mode-syntax-table)
@@ -1255,7 +1288,7 @@ After setting the stylevars run hooks according to STYLENAME
   (modify-syntax-entry ?\n   "> b" php-mode-syntax-table)
   (modify-syntax-entry ?$    "'" php-mode-syntax-table)
 
-  (set (make-local-variable 'syntax-propertize-function) #'php-syntax-propertize-function)
+  (setq-local syntax-propertize-function #'php-syntax-propertize-function)
   (add-to-list (make-local-variable 'syntax-propertize-extend-region-functions)
                #'php-syntax-propertize-extend-region)
 
@@ -1289,8 +1322,7 @@ After setting the stylevars run hooks according to STYLENAME
 
   ;; syntax-begin-function is obsolete in Emacs 25.1
   (with-no-warnings
-    (set (make-local-variable 'syntax-begin-function)
-         'c-beginning-of-syntax))
+    (setq-local syntax-begin-function 'c-beginning-of-syntax))
 
   ;; We map the php-{beginning,end}-of-defun functions so that they
   ;; replace the similar commands that we inherit from CC Mode.
@@ -1298,23 +1330,19 @@ After setting the stylevars run hooks according to STYLENAME
   ;; following two local variables, but we keep them for now until we
   ;; are completely sure their removal will not break any current
   ;; behavior or backwards compatibility.
-  (set (make-local-variable 'beginning-of-defun-function)
-       'php-beginning-of-defun)
-  (set (make-local-variable 'end-of-defun-function)
-       'php-end-of-defun)
+  (setq-local beginning-of-defun-function 'php-beginning-of-defun)
+  (setq-local end-of-defun-function 'php-end-of-defun)
 
-  (set (make-local-variable 'open-paren-in-column-0-is-defun-start)
-       nil)
-  (set (make-local-variable 'defun-prompt-regexp)
-       "^\\s-*function\\s-+&?\\s-*\\(\\(\\sw\\|\\s_\\)+\\)\\s-*")
-  (set (make-local-variable 'add-log-current-defun-header-regexp)
-       php-beginning-of-defun-regexp)
+  (setq-local open-paren-in-column-0-is-defun-start nil)
+  (setq-local defun-prompt-regexp
+              "^\\s-*function\\s-+&?\\s-*\\(\\(\\sw\\|\\s_\\)+\\)\\s-*")
+  (setq-local add-log-current-defun-header-regexp
+              php-beginning-of-defun-regexp)
 
   (when (>= emacs-major-version 25)
     (with-silent-modifications
       (save-excursion
         (php-syntax-propertize-function (point-min) (point-max))))))
-
 
 (declare-function semantic-create-imenu-index "semantic/imenu" (&optional stream))
 
@@ -1640,13 +1668,14 @@ a completion list."
      ;; with type, like in arglist)
      ("\\(\\$\\)\\(\\sw+\\)" 1 'php-variable-sigil)
 
-     ;; Array is a keyword, except in the following situations:
-     ;; - when used as cast, so that (int) and (array) look the same
+     ;; 'array' and 'callable' are keywords, except in the following situations:
      ;; - when used as a type hint
      ;; - when used as a return type
+     ("\\b\\(array\\|callable\\)\\s-+&?\\$" 1 font-lock-type-face)
+     (")\\s-*:\\s-*\\??\\(array\\|callable\\)\\b" 1 font-lock-type-face)
+     ;; For 'array', there is an additional situation:
+     ;; - when used as cast, so that (int) and (array) look the same
      ("(\\(array\\))" 1 font-lock-type-face)
-     ("\\b\\(array\\)\\s-+&?\\$" 1 font-lock-type-face)
-     (")\\s-*:\\s-*\\??\\(array\\)\\b" 1 font-lock-type-face)
 
      ;; namespaces
      ("\\(\\([a-zA-Z0-9_]+\\\\\\)+[a-zA-Z0-9_]+\\|\\(\\\\[a-zA-Z0-9_]+\\)+\\)[^:a-zA-Z0-9_\\\\]" 1 'font-lock-type-face)
@@ -1702,12 +1731,21 @@ a completion list."
                " \\(\\sw+\\)")
       1 font-lock-type-face)
 
-     ;; Highlight return types in functions and methods.
+     ;; Highlight the ? character for nullable return types.
+     ("function.+:\\s-*\\(\\?\\)\\(?:\\sw\\|\\s_\\|\\\\\\)+" 1 font-lock-type-face)
+     (")\\s-*:\\s-*\\(\\?\\)\\(?:\\sw\\|\\s_\\|\\\\\\)+\\s-*\\(?:\{\\|;\\)" 1 font-lock-type-face)
+
+     ;; Highlight the ? character for nullable type hints.
+     ("\\(\\?\\)\\(:?\\sw\\|\\s_\\|\\\\\\)+\\s-+\\$" 1 font-lock-type-face)
+
+     ;; Class names without a namespace are not highlighted at all when they
+     ;; are used as nullable type hints or return types (both nullable and
+     ;; non-nullable). We have to use separate regular expressions, because
+     ;; we want to capture the class name as well, not just the ? character
+     ;; like the regexps above.
+     ("\\?\\(\\(:?\\sw\\|\\s_\\)+\\)\\s-+\\$" 1 font-lock-type-face)
      ("function.+:\\s-*\\??\\(\\(?:\\sw\\|\\s_\\)+\\)" 1 font-lock-type-face)
      (")\\s-*:\\s-*\\??\\(\\(?:\\sw\\|\\s_\\)+\\)\\s-*\\(?:\{\\|;\\)" 1 font-lock-type-face)
-
-     ;; Highlight class names used as nullable type hints
-     ("\\?\\(\\(:?\\sw\\|\\s_\\)+\\)\\s-+\\$" 1 font-lock-type-face)
      ))
   "Detailed highlighting for PHP Mode.")
 
@@ -1854,9 +1892,4 @@ The output will appear in the buffer *PHP*."
              t)
 
 (provide 'php-mode)
-
 ;;; php-mode.el ends here
-
-;; Local Variables:
-;; firestarter: ert-run-tests-interactively
-;; End:

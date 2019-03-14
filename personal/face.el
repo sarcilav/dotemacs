@@ -20,7 +20,8 @@
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 
 ;; Theme
-(load-theme 'misterioso) ;; only works on emacs 24
+(load-theme 'tsdh-light)
+
 (set-cursor-color "#e47133")
 ;; no tabs
 (setq-default indent-tabs-mode nil)

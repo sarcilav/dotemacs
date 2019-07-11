@@ -20,7 +20,7 @@
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 
 ;; Theme
-(load-theme 'tsdh-light)
+(load-theme 'tsdh-dark)
 
 (set-cursor-color "#e47133")
 ;; no tabs

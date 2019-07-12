@@ -18,9 +18,9 @@
 	 ("Leo Liu" . "sdl.web@gmail.com"))
 	(:keywords "tools" "processes" "convenience"))])
  (ada-mode .
-	   [(6 1 0)
+	   [(6 1 1)
 	    ((wisi
-	      (2 1 0))
+	      (2 1 1))
 	     (cl-lib
 	      (1 0))
 	     (emacs
@@ -2174,7 +2174,7 @@
 		("Bastien" . "bzg@gnu.org"))
 	       (:maintainer "Bastien" . "bzg@gnu.org"))])
  (wisi .
-       [(2 1 0)
+       [(2 1 1)
 	((cl-lib
 	  (1 0))
 	 (emacs

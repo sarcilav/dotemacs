@@ -22,8 +22,6 @@
 ;; Theme
 (load-theme 'creamsody)
 (creamsody-modeline-one)
-(require 'powerline)
-(powerline-default-theme)
 
 (set-cursor-color "#e47133")
 ;; no tabs

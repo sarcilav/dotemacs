@@ -26,3 +26,5 @@
             (ibuffer-vc-set-filter-groups-by-vc-root)
             (unless (eq ibuffer-sorting-mode 'filename/process)
               (ibuffer-do-sort-by-filename/process))))
+;; init projectile
+(add-hook 'after-init-hook #'projectile-mode)

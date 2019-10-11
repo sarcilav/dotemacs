@@ -44,15 +44,14 @@
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 (slime-setup '(slime-fancy))
 
-;; Ask to save *scratch*
-(defun try-to-save-*scratch*-and-exit ()
-  "Ask to savewhether or not to save *scratch*, and then close if y was pressed"
+;; Fold toggling
+(defun toggle-fold ()
+  "Toggle code folding according to indentation of current line."
   (interactive)
-  (when (y-or-n-p (format "Do you want to save *scratch*? "))
-    (switch-to-buffer "*scratch*")
-    (interactive)
-    (save-buffer))
-  (save-buffers-kill-emacs))
+  (set-selective-display
+   (if selective-display
+       nil
+     (save-excursion
+       (back-to-indentation)
+       (1+ (current-column))))))
 
-(when window-system
-  (global-set-key (kbd "C-x C-c") 'try-to-save-*scratch*-and-exit))

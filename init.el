@@ -9,13 +9,13 @@
 (setq ido-enable-prefix nil
       ido-enable-flex-matching t
       ido-create-new-buffer 'always
-      ido-use-filename-at-point t
+      ido-use-filename-at-point 'guess
       ido-max-prospects 10)
 
 
 (require 'package)
 ;; add melpa-stable
-(add-to-list 'package-archives             
+(add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/"))
 
 ;; add cider to the pinned packages
@@ -40,7 +40,7 @@
  '(magit-push-arguments (quote ("--set-upstream")))
  '(package-selected-packages
    (quote
-    (creamsody-theme slime ag lua-mode paredit yasnippet cider yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe)))
+    (projectile-rails fzf creamsody-theme slime ag lua-mode paredit yasnippet cider yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe)))
  '(safe-local-variable-values (quote ((encoding . utf-8)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -54,11 +54,12 @@
 
 ;; Custom 'files'
 (require 'multi-term)
-(setq multi-term-program "/usr/local/Cellar/bash/5.0.7/bin/bash")
+(setq multi-term-program "/usr/local/Cellar/bash/5.0.11/bin/bash")
 (load "personal.el")
 (load "face.el")
 (load "bindings.el")
 (load "modes.el")
 (load "hooks.el")
+(setq projectile-completion-system 'ido)
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)

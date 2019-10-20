@@ -40,7 +40,7 @@
  '(magit-push-arguments (quote ("--set-upstream")))
  '(package-selected-packages
    (quote
-    (projectile-rails fzf creamsody-theme slime ag lua-mode paredit yasnippet cider yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe)))
+    (haskell-mode projectile-rails fzf creamsody-theme slime ag lua-mode paredit yasnippet cider yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe)))
  '(safe-local-variable-values (quote ((encoding . utf-8)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

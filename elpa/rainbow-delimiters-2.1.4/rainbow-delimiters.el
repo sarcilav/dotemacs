@@ -2,13 +2,13 @@
 
 ;; Copyright (C)
 ;;   2010-2013 Jeremy Rayman
-;;   2013-2016 Fanael Linithien
+;;   2013-2019 Fanael Linithien
 ;; Author: Jeremy Rayman <opensource@jeremyrayman.com>
 ;;         Fanael Linithien <fanael4@gmail.com>
 ;; Maintainer: Fanael Linithien <fanael4@gmail.com>
 ;; Created: 2010-09-02
-;; Version: 2.1.3
-;; Package-Version: 2.1.3
+;; Version: 2.1.4
+;; Package-Version: 2.1.4
 ;; Keywords: faces, convenience, lisp, tools
 ;; Homepage: https://github.com/Fanael/rainbow-delimiters
 
@@ -105,14 +105,24 @@ The function should not move the point or mark or change the match data."
   :type 'function
   :group 'rainbow-delimiters)
 
+(defface rainbow-delimiters-base-face
+  '((default (:inherit unspecified)))
+  "Face inherited by all other rainbow-delimiter faces."
+  :group 'rainbow-delimiters-faces)
+
+(defface rainbow-delimiters-base-error-face
+  '((default (:inherit rainbow-delimiters-base-face))
+    (t (:foreground "#88090B")))
+  "Face inherited by all other rainbow-delimiter error faces."
+  :group 'rainbow-delimiters-faces)
+
 (defface rainbow-delimiters-unmatched-face
-  '((((background light)) (:foreground "#88090B"))
-    (((background dark)) (:foreground "#88090B")))
+  '((default (:inherit rainbow-delimiters-base-error-face)))
   "Face to highlight unmatched closing delimiters in."
   :group 'rainbow-delimiters-faces)
 
 (defface rainbow-delimiters-mismatched-face
-  '((t :inherit rainbow-delimiters-unmatched-face))
+  '((default (:inherit rainbow-delimiters-unmatched-face)))
   "Face to highlight mismatched closing delimiters in."
   :group 'rainbow-delimiters-faces)
 
@@ -125,7 +135,8 @@ The function should not move the point or mark or change the match data."
                         "#b0b0b3" "#90a890" "#a2b6da" "#9cb6ad"]))
       (dotimes (i 9)
         (push `(defface ,(intern (format "rainbow-delimiters-depth-%d-face" (1+ i)))
-                 '((((class color) (background light)) :foreground ,(aref light-colors i))
+                 '((default (:inherit rainbow-delimiters-base-face))
+                   (((class color) (background light)) :foreground ,(aref light-colors i))
                    (((class color) (background dark)) :foreground ,(aref dark-colors i)))
                  ,(format "Nested delimiter face, depth %d." (1+ i))
                  :group 'rainbow-delimiters-faces)

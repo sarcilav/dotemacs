@@ -17,22 +17,22 @@ Will try to look for a template or partial file, and assets file.
 \(fn)" t nil)
 
 (autoload 'projectile-rails-stylesheet-goto-file-at-point "projectile-rails" "\
-Try to find stylesheet file at point
+Try to find stylesheet file at point.
 
 \(fn)" t nil)
 
 (autoload 'projectile-rails-javascript-goto-file-at-point "projectile-rails" "\
-Try to find javascript file at point
+Try to find javascript file at point.
 
 \(fn)" t nil)
 
 (autoload 'projectile-rails-ruby-goto-file-at-point "projectile-rails" "\
-Try to find ruby file at point
+Try to find ruby file at point.
 
 \(fn)" t nil)
 
 (autoload 'projectile-rails-goto-file-at-point "projectile-rails" "\
-Try to find file at point
+Try to find file at point.
 
 \(fn)" t nil)
 

@@ -4,8 +4,8 @@
 
 ;; Author:            Adam Sokolnicki <adam.sokolnicki@gmail.com>
 ;; URL:               https://github.com/asok/projectile-rails
-;; Package-Version: 0.17.0
-;; Version:           0.17.0
+;; Package-Version: 0.19.0
+;; Version:           0.19.0
 ;; Keywords:          rails, projectile
 ;; Package-Requires:  ((emacs "24.3") (projectile "0.12.0") (inflections "1.1") (inf-ruby "2.2.6") (f "0.13.0") (rake "0.3.2"))
 
@@ -247,10 +247,43 @@
   :group 'projectile-rails
   :type 'string)
 
-(defcustom projectile-rails-verify-root-file "config/routes.rb"
-  "The file that is used to verify rails root directory."
+(defcustom projectile-rails-verify-root-files '("config/routes.rb" "config/environment.rb")
+  "The list of files that is used to verify rails root directory.
+When any of the files are found it means that this is a rails app."
   :group 'projectile-rails
   :type 'string)
+
+(define-obsolete-variable-alias 'projectile-rails-verify-root-file 'projectile-rails-verify-root-files)
+
+(defcustom projectile-rails-custom-console-command nil
+  "When set it will be used instead of a preloader as the command for running console."
+  :group 'projectile-rails
+  :type 'string)
+
+(defcustom projectile-rails-custom-dbconsole-command nil
+  "When set it will be used instead of a preloader as the command for running dbconsole."
+  :group 'projectile-rails
+  :type 'string)
+
+(defcustom projectile-rails-custom-server-command nil
+  "When set it will be used instead of a preloader as the command for running server."
+  :group 'projectile-rails
+  :type 'string)
+
+(defcustom projectile-rails-custom-generate-command nil
+  "When set it will be used instead of a preloader as the command for running generate."
+  :group 'projectile-rails
+  :type 'string)
+
+(defcustom projectile-rails-custom-destroy-command nil
+  "When set it will be used instead of a preloader as the command for running destroy."
+  :group 'projectile-rails
+  :type 'string)
+
+(defcustom projectile-rails-expand-snippet-with-magic-comment nil
+  "When t the new file snippets will be expanded with the magic comment 'frozen_string_literal: true'."
+  :group 'projectile-rails
+  :type 'boolean)
 
 (defvar projectile-rails-extracted-region-snippet
   '(("erb"  . "<%%= render '%s' %%>")
@@ -282,21 +315,27 @@
     ("scaffold" (("app/models/" "app/models/\\(.+\\)\\.rb$")))
     ("task" (("lib/tasks/" "lib/tasks/\\(.+\\)\\.rake$")))))
 
-(defmacro projectile-rails-with-preloader (&rest cases)
-  "Checks for the presence of pre-loaders and returns corresponding value.
+(defun projectile-rails--command (&rest cases)
+  "Check for the presence of pre-loaders and return corresponding value.
 
 CASES is a plist with props being :spring, :zeus or :vanilla.
 Each corresponds to a preloader (:vanilla means no preloader).
 If a preloader is running the value for the given prop is returned."
-  `(cond ((projectile-rails-spring-p)
-          ,(plist-get cases :spring))
-         ((projectile-rails-zeus-p)
-          ,(plist-get cases :zeus))
-         (t
-          ,(plist-get cases :vanilla))))
+  (let ((custom-command (plist-get cases :custom)))
+    (cond
+     (custom-command
+      (projectile-rails--ensure-suffix custom-command " "))
+     ((projectile-rails-spring-p)
+      (plist-get cases :spring))
+     ((projectile-rails-zeus-p)
+      (plist-get cases :zeus))
+     (t
+      (plist-get cases :vanilla)))))
+
+(defalias 'projectile-rails-with-preloader 'projectile-rails--command)
 
 (defmacro projectile-rails-with-root (body-form)
-  "Run BODY-FORM within DEFAULT-DIRECTORY set to `projectile-rails-root'"
+  "Run BODY-FORM within DEFAULT-DIRECTORY set to `projectile-rails-root'."
   `(let ((default-directory (projectile-rails-root)))
      ,body-form))
 
@@ -306,7 +345,7 @@ If a preloader is running the value for the given prop is returned."
 The bound variables are \"singular\" and \"plural\".
 Argument DIR is the directory to which the search should be narrowed."
   `(let* ((singular (projectile-rails-current-resource-name))
-          (plural (pluralize-string singular))
+          (plural (inflection-pluralize-string singular))
           (abs-current-file (buffer-file-name (current-buffer)))
           (current-file (if abs-current-file
                             (file-relative-name abs-current-file
@@ -329,7 +368,7 @@ Argument DIR is the directory to which the search should be narrowed."
       (concat (f-dirname (gethash (-first-item files) choices)) choice))))
 
 (defun projectile-rails-spring-p ()
-  "Returns t if spring is running."
+  "Return t if spring is running."
   (let ((root (directory-file-name (projectile-rails-root))))
     (or
      ;; Older versions
@@ -346,7 +385,7 @@ Argument DIR is the directory to which the search should be narrowed."
         (file-exists-p (format "%s/spring-%s/%s.pid" path (user-real-uid) application-id)))))))
 
 (defun projectile-rails-zeus-p ()
-  "Returns t if zeus is running."
+  "Return t if zeus is running."
   (unless projectile-rails-zeus-sock
     (setq
      projectile-rails-zeus-sock
@@ -373,10 +412,11 @@ Argument DIR is the directory to which the search should be narrowed."
               (append keywords projectile-rails-active-support-keywords)))))
 
 (defun projectile-rails-dir-files (directory)
-  "Like `projectile-dir-files' but take `projectile-rails-root'."
-  (--map
-   (substring it (length (projectile-rails-root-relative-to-project-root)))
-   (projectile-dir-files directory)))
+  "Wrapper around `projectile-dir-files', list the files in DIRECTORY and in its sub-directories.
+
+Files are returned as relative paths to DIRECTORY. This function was created to handle the case when rails is inside a
+subdirectory, but nowadays it does nothing as `projectile-dir-files' does the right thing."
+  (projectile-dir-files directory))
 
 (defun projectile-rails-choices (dirs)
   "Uses `projectile-rails-dir-files' function to find files in directories.
@@ -396,6 +436,7 @@ Returns a hash table with keys being short names (choices) and values being rela
     hash))
 
 (defun projectile-rails-hash-keys (hash)
+  "Return the keys in HASH."
   (if (boundp 'hash-table-keys)
       (hash-table-keys hash)
     (let (keys)
@@ -403,22 +444,23 @@ Returns a hash table with keys being short names (choices) and values being rela
       keys)))
 
 (defmacro projectile-rails-find-resource (prompt dirs &optional newfile-template)
-  "Presents files from DIRS to the user using `projectile-completing-read'.
+  "Presents files from DIRS with PROMPT to the user using `projectile-completing-read'.
 
 If users chooses a non existant file and NEWFILE-TEMPLATE is not nil
 it will use that variable to interpolate the name for the new file.
 NEWFILE-TEMPLATE will be the argument for `s-lex-format'.
 The bound variable is \"filename\"."
-  `(let* ((choices (projectile-rails-choices ,dirs))
-          (filename (or
-                     (projectile-completing-read ,prompt (projectile-rails-hash-keys choices))
-                     (user-error "The completion system you're using does not allow inputting arbitrary value.")))
-          (filepath (gethash filename choices)))
-
-     (if filepath
-         (projectile-rails-goto-file filepath)
-       (when ,newfile-template
-         (projectile-rails-goto-file (s-lex-format ,newfile-template) t)))))
+  `(lexical-let ((choices (projectile-rails-choices ,dirs)))
+     (projectile-completing-read
+      ,prompt
+      (projectile-rails-hash-keys choices)
+      :action (lambda (c)
+                (let* ((filepath (gethash c choices))
+                       (filename c)) ;; so `s-lex-format' can interpolate FILENAME
+                  (if filepath
+                      (projectile-rails-goto-file filepath)
+                    (when ,newfile-template
+                      (projectile-rails-goto-file (s-lex-format ,newfile-template) t))))))))
 
 (defun projectile-rails-find-model ()
   "Find a model."
@@ -461,7 +503,7 @@ The bound variable is \"filename\"."
    "app/views/layouts/${filename}"))
 
 (defun projectile-rails-find-rake-task (arg)
-  "Find a file where a task is defined."
+  "Find a file where a task is defined.  ARG is passed straight to function `rake-find-task'."
   (interactive "P")
   (rake-find-task arg))
 
@@ -556,7 +598,7 @@ The bound variable is \"filename\"."
      ("config/environments/" "\\(.+\\)\\.rb$" "environments/"))))
 
 (defun projectile-rails-find-webpack ()
-  "Find a webpack configuration"
+  "Find a webpack configuration."
   (interactive)
   (projectile-rails-find-resource
    "webpack config: "
@@ -694,7 +736,7 @@ The bound variable is \"filename\"."
                           do (if (string-match re file-name)
                                  (return (match-string 1 file-name)))))))
     (and name
-         (singularize-string name))))
+         (inflection-singularize-string name))))
 
 (defun projectile-rails-list-entries (fun dir)
   "Call FUN on DIR being a relative directory within a rails project.
@@ -745,14 +787,21 @@ The mode of the output buffer will be `projectile-rails-compilation-mode'."
   "Generate a cache key based on the current directory and the given KEY."
   (format "%s-%s" default-directory key))
 
+(defun projectile-rails--rails-app-p (root)
+  "Returns t if any of the relative files in `projectile-rails-verify-root-files' is found.
+ROOT is used to expand the relative files."
+  (--any-p
+   (file-exists-p (expand-file-name it root))
+   (-list projectile-rails-verify-root-files)))
+
 (defun projectile-rails-root ()
-  "Returns rails root directory if this file is a part of a Rails application else nil"
+  "Return rails root directory if this file is a part of a Rails application else nil."
   (let* ((cache-key (projectile-rails-cache-key "root"))
          (cache-value (gethash cache-key projectile-rails-cache-data)))
     (or cache-value
         (ignore-errors
           (let ((root (projectile-locate-dominating-file default-directory projectile-rails-root-file)))
-            (when (file-exists-p (expand-file-name projectile-rails-verify-root-file root))
+            (when (projectile-rails--rails-app-p root)
               (puthash cache-key root projectile-rails-cache-data)
               root))))))
 
@@ -765,7 +814,7 @@ The mode of the output buffer will be `projectile-rails-compilation-mode'."
       (substring rails-root (length (f-common-parent (list rails-root project-root)))))))
 
 (defun projectile-rails-expand-root (dir)
-  "Like `projectile-expand-root' but consider `projectile-rails-root'."
+  "Like `projectile-expand-root' (expands DIR) but consider `projectile-rails-root'."
   (projectile-expand-root (concat (projectile-rails-root) dir)))
 
 (defun projectile-rails--file-exists-p (filepath)
@@ -776,7 +825,8 @@ The mode of the output buffer will be `projectile-rails-compilation-mode'."
   "Start a rails console, asking for which if ARG is not nil."
   (interactive "P")
   (projectile-rails-with-root
-   (let ((rails-console-command (projectile-rails-with-preloader
+   (let ((rails-console-command (projectile-rails--command
+                                 :custom projectile-rails-custom-console-command
                                  :spring (concat projectile-rails-spring-command " rails console")
                                  :zeus "zeus console"
                                  :vanilla (concat projectile-rails-vanilla-command " console"))))
@@ -790,7 +840,7 @@ The mode of the output buffer will be `projectile-rails-compilation-mode'."
 
 ;; Shamelessly stolen from rinari.el
 (defun projectile-rails--db-config ()
-  "Returns contents of config/database.yml as a list"
+  "Return contents of config/database.yml as a list."
   (json-read-from-string
    (shell-command-to-string
     (format
@@ -854,7 +904,8 @@ The buffer for interacting with SQL client is created via `sql-product-interacti
           (sqli-options    (sql-get-product-feature product :sqli-options))
           (sqli-program    (sql-get-product-feature product :sqli-program))
           (sql-comint-func (sql-get-product-feature product :sqli-comint-func))
-          (commands (s-split " " (projectile-rails-with-preloader
+          (commands (s-split " " (projectile-rails--command
+                                  :custom projectile-rails-custom-dbconsole-command
                                   :spring (concat projectile-rails-spring-command " rails dbconsole")
                                   :zeus (concat projectile-rails-zeus-command " dbconsole")
                                   :vanilla (concat projectile-rails-vanilla-command " dbconsole")))))
@@ -903,6 +954,10 @@ This only works when yas package is installed."
 (defun projectile-rails--expand-snippet (snippet)
   "Turn on `yas-minor-mode' and expand SNIPPET."
   (yas-minor-mode +1)
+
+  (when projectile-rails-expand-snippet-with-magic-comment
+    (setq snippet (format "# frozen_string_literal: true\n\n%s" snippet)))
+
   (yas-expand-snippet snippet))
 
 (defun projectile-rails-expand-corresponding-snippet ()
@@ -944,7 +999,7 @@ This only works when yas package is installed."
             (projectile-rails--snippet-for-module "${1:class} %s\n$2\nend" name))))))
 
 (defun projectile-rails--goto-file-at-point (f)
-  "Let name and line variables and call F"
+  "Let name and line variables and call F."
   (let ((name (projectile-rails-name-at-point))
         (line (projectile-rails-current-line))
         (case-fold-search nil))
@@ -989,7 +1044,7 @@ This only works when yas package is installed."
     (projectile-rails-goto-gem (thing-at-point 'filename)) t)
 
    ((string-match-p "^[a-z]" name)
-    (projectile-rails-find-constant (singularize-string name)) t)
+    (projectile-rails-find-constant (inflection-singularize-string name)) t)
 
    ((string-match-p "^\\(::\\)?[A-Z]" name)
     (projectile-rails-goto-constant-at-point) t)))
@@ -1004,28 +1059,28 @@ Will try to look for a template or partial file, and assets file."
 
 ;;;###autoload
 (defun projectile-rails-stylesheet-goto-file-at-point ()
-  "Try to find stylesheet file at point"
+  "Try to find stylesheet file at point."
   (interactive)
   (projectile-rails--goto-file-at-point
    'projectile-rails--stylesheet-goto-file-at-point))
 
 ;;;###autoload
 (defun projectile-rails-javascript-goto-file-at-point ()
-  "Try to find javascript file at point"
+  "Try to find javascript file at point."
   (interactive)
   (projectile-rails--goto-file-at-point
    'projectile-rails--javascript-goto-file-at-point))
 
 ;;;###autoload
 (defun projectile-rails-ruby-goto-file-at-point ()
-  "Try to find ruby file at point"
+  "Try to find ruby file at point."
   (interactive)
   (projectile-rails--goto-file-at-point
    'projectile-rails--ruby-goto-file-at-point))
 
 ;;;###autoload
 (defun projectile-rails-goto-file-at-point ()
-  "Try to find file at point"
+  "Try to find file at point."
   (interactive)
   (projectile-rails--goto-file-at-point
    (lambda (name line)
@@ -1036,11 +1091,11 @@ Will try to look for a template or partial file, and assets file."
            thereis (funcall f name line)))))
 
 (defun projectile-rails-classify (name)
-  "Accepts a filepath, splits it by '/' character and classifieses each of the element"
+  "Split NAME by '/' character and classify each of the element."
   (--map (replace-regexp-in-string "_" "" (upcase-initials it)) (split-string name "/")))
 
 (defun projectile-rails-declassify (name)
-  "Converts passed string to a relative filepath."
+  "Convert NAME to a relative filepath."
   (let ((case-fold-search nil))
     (downcase
      (replace-regexp-in-string
@@ -1051,16 +1106,17 @@ Will try to look for a template or partial file, and assets file."
         "\\([a-z]\\)\\([A-Z]\\)" "\\1 \\2" name))))))
 
 (defun projectile-rails-server ()
-  "Runs rails server command"
+  "Run rails server command."
   (interactive)
   (when (not (projectile-rails--file-exists-p "config/environment.rb"))
-    (user-error "You're not running it from a rails application."))
+    (user-error "You're not running it from a rails application"))
   (if (member projectile-rails-server-buffer-name (mapcar 'buffer-name (buffer-list)))
       (switch-to-buffer projectile-rails-server-buffer-name)
     (projectile-rails-with-root
-     (compile (projectile-rails-with-preloader :spring (concat projectile-rails-spring-command " rails server")
-                                               :zeus (concat projectile-rails-zeus-command " server")
-                                               :vanilla (concat projectile-rails-vanilla-command " server"))
+     (compile (projectile-rails--command :spring (concat projectile-rails-spring-command " rails server")
+                                         :zeus (concat projectile-rails-zeus-command " server")
+                                         :vanilla (concat projectile-rails-vanilla-command " server")
+                                         :custom projectile-rails-custom-server-command)
               'projectile-rails-server-mode))))
 
 (defun projectile-rails--completion-in-region ()
@@ -1076,10 +1132,11 @@ Will try to look for a template or partial file, and assets file."
     (concat command (read-from-minibuffer command nil keymap))))
 
 (defun projectile-rails-generate ()
-  "Runs rails generate command"
+  "Run rails generate command."
   (interactive)
   (projectile-rails-with-root
-   (let ((command-prefix (projectile-rails-with-preloader
+   (let ((command-prefix (projectile-rails--command
+                          :custom projectile-rails-custom-generate-command
                           :spring (concat projectile-rails-spring-command " rails generate ")
                           :zeus (concat projectile-rails-zeus-command " generate ")
                           :vanilla (concat projectile-rails-vanilla-command " generate "))))
@@ -1107,10 +1164,11 @@ Will try to look for a template or partial file, and assets file."
       (concat command user-input))))
 
 (defun projectile-rails-destroy ()
-  "Runs rails destroy command."
+  "Run rails destroy command."
   (interactive)
   (projectile-rails-with-root
-   (let ((command-prefix (projectile-rails-with-preloader
+   (let ((command-prefix (projectile-rails--command
+                          :custom projectile-rails-custom-destroy-command
                           :spring (concat projectile-rails-spring-command " rails destroy ")
                           :zeus (concat projectile-rails-zeus-command " destroy ")
                           :vanilla (concat projectile-rails-vanilla-command " destroy "))))
@@ -1119,17 +1177,17 @@ Will try to look for a template or partial file, and assets file."
       'projectile-rails-compilation-mode))))
 
 (defun projectile-rails-sanitize-and-goto-file (dir name &optional ext)
-  "Calls `projectile-rails-goto-file' with passed arguments sanitizing them before."
+  "Sanitize DIR, NAME and EXT then passe them to `projectile-rails-goto-file'."
   (projectile-rails-goto-file
    (concat
     (projectile-rails-sanitize-dir-name dir) (projectile-rails-declassify name) ext)))
 
 (defun projectile-rails-goto-file (filepath &optional ask)
-  "Finds the FILEPATH after expanding root."
+  "Find FILEPATH after expanding root.  ASK is passed straight to `projectile-rails-ff'."
   (projectile-rails-ff (projectile-rails-expand-root filepath) ask))
 
 (defun projectile-rails-goto-gem (gem)
-  "Uses `bundle-open' to open GEM. If the function is not defined notifies user."
+  "Use `bundle-open' to open GEM.  If the function is not defined notify user."
   (if (not (fboundp 'bundle-open))
       (user-error "Please install bundler.el from https://github.com/tobiassvn/bundler.el")
     (message "Using bundle-open command to open the gem")
@@ -1217,7 +1275,7 @@ DIRS are directories where to look for assets."
   (string-prefix-p "app/views/" (s-chop-prefix (projectile-rails-root) path)))
 
 (defun projectile-rails--ignore-buffer-p ()
-  "Returns t if `projectile-rails' should not be enabled for the current buffer"
+  "Return t if `projectile-rails' should not be enabled for the current buffer."
   (string-match-p "\\*\\(Minibuf-[0-9]+\\|helm mini\\|helm projectile\\)\\*" (buffer-name)))
 
 (defun projectile-rails-extract-region (partial-name)
@@ -1290,7 +1348,7 @@ If called interactively will ask user for the PARTIAL-NAME."
       (dired dir))))
 
 (defun projectile-rails-goto-gemfile ()
-  "Visit Gemfile"
+  "Visit Gemfile."
   (interactive)
   (projectile-rails-goto-file "Gemfile"))
 
@@ -1320,7 +1378,7 @@ If called interactively will ask user for the PARTIAL-NAME."
   (projectile-rails-goto-file "spec/spec_helper.rb"))
 
 (defun projectile-rails-ff (path &optional ask)
-  "Calls `find-file' function on PATH when it is not nil and the file exists.
+  "Call `find-file' function on PATH when it is not nil and the file exists.
 
 If file does not exist and ASK in not nil it will ask user to proceed."
   (if (or (and path (file-exists-p path))
@@ -1388,7 +1446,10 @@ If file does not exist and ASK in not nil it will ask user to proceed."
   name)
 
 (defun projectile-rails-sanitize-dir-name (name)
-  (if (s-ends-with? "/" name) name (concat name "/")))
+  (projectile-rails--ensure-suffix name "/"))
+
+(defun projectile-rails--ensure-suffix (name suffix)
+  (if (s-ends-with? suffix name) name (concat name suffix)))
 
 (defun projectile-rails-current-line ()
   (save-excursion
@@ -1573,8 +1634,7 @@ If file does not exist and ASK in not nil it will ask user to proceed."
     (projectile-rails-set-assets-dirs)
     (projectile-rails-set-fixture-dirs)))
 
-(dolist (mode '(ruby-mode-hook enh-ruby-mode-hook))
-  (add-hook mode #'projectile-rails-expand-snippet-maybe))
+(add-hook 'projectile-rails-mode-hook #'projectile-rails-expand-snippet-maybe)
 
 ;;;###autoload
 (defun projectile-rails-on ()

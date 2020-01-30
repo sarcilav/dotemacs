@@ -7,9 +7,9 @@
 
 
 ;;;;;;;;;;;;;; tc-TopCoder fast compile and run
-(defun tc () (interactive)
-  (compile (concat "g++ " (buffer-name)" -g -o "(substring (buffer-name) 0 -4)" && ./"(substring (buffer-name) 0 -4)))
-  )
+(defun tc ()
+  (interactive)
+  (compile (concat "g++ " (buffer-name)" -g -o "(substring (buffer-name) 0 -4)" && ./"(substring (buffer-name) 0 -4))))
 ;;;;;;;;;;;;;; tc-TopCoder
 
 

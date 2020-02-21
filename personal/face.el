@@ -2,7 +2,7 @@
 (setq inhibit-startup-message t)
 (menu-bar-mode 1)
 (tool-bar-mode -1)
-(scroll-bar-mode nil)
+(scroll-bar-mode -1)
 (mouse-wheel-mode t)
 (line-number-mode 1)
 (column-number-mode 1)

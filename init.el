@@ -54,7 +54,7 @@
 
 ;; Custom 'files'
 (require 'multi-term)
-(setq multi-term-program "/usr/local/Cellar/bash/5.0.11/bin/bash")
+(setq multi-term-program "/usr/local/Cellar/bash/5.0.16/bin/bash")
 (load "personal.el")
 (load "face.el")
 (load "bindings.el")

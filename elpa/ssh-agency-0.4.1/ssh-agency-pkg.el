@@ -1,0 +1,2 @@
+;;; Generated package description from ssh-agency.el  -*- no-byte-compile: t -*-
+(define-package "ssh-agency" "0.4.1" "manage ssh-agent from Emacs" '((emacs "24.4") (dash "2.10.0")) :commit "a5377e4317365a3d5442e06d5c255d4a7c7618db" :authors '(("Noam Postavsky" . "npostavs@user.sourceforge.net")) :maintainer '("Noam Postavsky" . "npostavs@user.sourceforge.net") :url "https://github.com/magit/ssh-agency")

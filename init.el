@@ -12,6 +12,9 @@
       ido-use-filename-at-point 'guess
       ido-max-prospects 10)
 
+(when (and (equal emacs-version "27.2")
+           (eql system-type 'darwin))
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 
 (require 'package)
 ;; add melpa-stable
@@ -33,15 +36,13 @@
  ;; If there is more than one, they won't work right.
  '(coffee-tab-width 2)
  '(custom-safe-themes
-   (quote
-    ("c1de07961a3b5b49bfd50080e7811eea9c949526084df8d64ce1b4e0fdc076ff" "b97a01622103266c1a26a032567e02d920b2c697ff69d40b7d9956821ab666cc" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" default)))
- '(magit-log-arguments (quote ("--graph" "--color" "--decorate" "-n256")))
+   '("c1de07961a3b5b49bfd50080e7811eea9c949526084df8d64ce1b4e0fdc076ff" "b97a01622103266c1a26a032567e02d920b2c697ff69d40b7d9956821ab666cc" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" default))
+ '(magit-log-arguments '("--graph" "--color" "--decorate" "-n256"))
  '(magit-notes-arguments nil)
- '(magit-push-arguments (quote ("--set-upstream")))
+ '(magit-push-arguments '("--set-upstream"))
  '(package-selected-packages
-   (quote
-    (git-link projectile-rails fzf creamsody-theme slime ag lua-mode paredit yasnippet cider yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe)))
- '(safe-local-variable-values (quote ((encoding . utf-8)))))
+   '(ssh-agency fzf creamsody-theme slime ag lua-mode paredit cider yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe))
+ '(safe-local-variable-values '((encoding . utf-8))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -54,7 +55,9 @@
 
 ;; Custom 'files'
 (require 'multi-term)
-(setq multi-term-program "/usr/local/Cellar/bash/5.0.16/bin/bash")
+(setq multi-term-program "/usr/local/Cellar/bash/5.1.8/bin/bash")
+(setq multi-term-program-switches "--login")
+
 (load "personal.el")
 (load "face.el")
 (load "bindings.el")

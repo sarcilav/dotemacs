@@ -15,12 +15,12 @@
 ;; set path
 
 (let ((path))
-  (setq path (concat "/usr/local/heroku/bin:"
+  (setq path (concat "/usr/local/bin:"
+                     "/usr/local/sbin:"
                      "/usr/bin:"
                      "/bin:"
                      "/usr/sbin:"
                      "/sbin:"
-                     "/usr/local/bin:"
                      "/opt/X11/bin:"
                      "/usr/texbin:"
                      "/Applications/Emacs.app/Contents/MacOS/bin:"
@@ -39,10 +39,10 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; SLIME
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
+;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
 ;; Replace "sbcl" with the path to your implementation
-(setq inferior-lisp-program "/usr/local/bin/sbcl")
-(slime-setup '(slime-fancy))
+;; (setq inferior-lisp-program "/usr/local/bin/sbcl")
+;; (slime-setup '(slime-fancy))
 
 ;; Fold toggling
 (defun toggle-fold ()
@@ -55,3 +55,16 @@
        (back-to-indentation)
        (1+ (current-column))))))
 
+
+(require 'tramp)
+(add-to-list 'tramp-methods
+  '("gcssh"
+    (tramp-login-program        "gcloud compute ssh")
+    (tramp-login-args           (("%h")))
+    (tramp-async-args           (("-q")))
+    (tramp-remote-shell         "/bin/bash")
+    (tramp-remote-shell-args    ("-c"))
+    (tramp-gw-args              (("-o" "GlobalKnownHostsFile=/dev/null")
+                                 ("-o" "UserKnownHostsFile=/dev/null")
+                                 ("-o" "StrictHostKeyChecking=no")))
+    (tramp-default-port         22)))

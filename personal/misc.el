@@ -21,12 +21,13 @@
                      "/bin:"
                      "/usr/sbin:"
                      "/sbin:"
-                     "/opt/X11/bin:"
                      "/usr/texbin:"
                      "/Applications/Emacs.app/Contents/MacOS/bin:"
-                     "~/.rvm/bin"))
-  (setenv "PATH" path)
-  (add-to-list 'exec-path "/usr/local/bin"))
+                     "~/.rvm/bin:"
+                      "/opt/homebrew/bin"))
+  (setenv "PATH" path))
+(setq-default shell-file-name "/opt/homebrew/bin/bash")
+
 
 (setq dotfiles-dir (file-name-directory
                     (or (buffer-file-name) load-file-name)))

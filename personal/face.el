@@ -13,7 +13,7 @@
 
 ;; nice fonts in OS X
 (setq mac-allow-anti-aliasing t)
-(set-frame-font "-apple-inconsolata-medium-r-normal--0-0-0-0-m-0-iso10646-1")
+(set-frame-font "-PfEd-Monoid HalfLoose-normal-normal-semicondensed-*-*-*-*-*-*-0-iso10646-1")
 (set-face-attribute 'default nil :height 180)
 
 ;; interpret and use ansi color codes in shell output windows

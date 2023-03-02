@@ -55,7 +55,7 @@
 
 ;; Custom 'files'
 (require 'multi-term)
-(setq multi-term-program "/opt/homebrew/bin/bash")
+(setq multi-term-program "/usr/bin/bash")
 (setq multi-term-program-switches "--login")
 
 (load "personal.el")

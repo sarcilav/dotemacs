@@ -1,6 +1,6 @@
 ;; Clean interface
 (setq inhibit-startup-message t)
-(menu-bar-mode 1)
+(menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (mouse-wheel-mode t)
@@ -11,9 +11,10 @@
 (prefer-coding-system 'utf-8)
 (blink-cursor-mode t)
 
-;; nice fonts in OS X
+;; nice fonts
 (setq mac-allow-anti-aliasing t)
-(set-frame-font "-PfEd-Monoid HalfLoose-normal-normal-semicondensed-*-*-*-*-*-*-0-iso10646-1")
+(set-frame-font "-PfEd-Monoid HalfLoose-normal-normal-semicondensed-13-*-*-*-*-c-60-iso10646-1")
+;;(set-frame-font "-PfEd-Monoid HalfLoose-normal-normal-semicondensed-*-*-*-*-*-*-0-iso10646-1")
 (set-face-attribute 'default nil :height 180)
 
 ;; interpret and use ansi color codes in shell output windows

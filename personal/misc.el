@@ -22,11 +22,9 @@
                      "/usr/sbin:"
                      "/sbin:"
                      "/usr/texbin:"
-                     "/Applications/Emacs.app/Contents/MacOS/bin:"
-                     "~/.rvm/bin:"
-                      "/opt/homebrew/bin"))
+                     "~/.rvm/bin:"))
   (setenv "PATH" path))
-(setq-default shell-file-name "/opt/homebrew/bin/bash")
+(setq-default shell-file-name "/usr/bin/bash")
 
 
 (setq dotfiles-dir (file-name-directory

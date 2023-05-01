@@ -13,7 +13,7 @@
 
 ;; nice fonts
 (setq mac-allow-anti-aliasing t)
-(set-frame-font "-PfEd-Monoid HalfLoose-normal-normal-semicondensed-13-*-*-*-*-c-60-iso10646-1")
+(set-frame-font "-PfEd-Monoid-normal-normal-semicondensed-13-*-*-*-*-c-60-iso10646-1")
 ;;(set-frame-font "-PfEd-Monoid HalfLoose-normal-normal-semicondensed-*-*-*-*-*-*-0-iso10646-1")
 (set-face-attribute 'default nil :height 180)
 

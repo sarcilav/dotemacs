@@ -36,7 +36,7 @@
  ;; If there is more than one, they won't work right.
  '(coffee-tab-width 2)
  '(custom-safe-themes
-   '("c1de07961a3b5b49bfd50080e7811eea9c949526084df8d64ce1b4e0fdc076ff" "b97a01622103266c1a26a032567e02d920b2c697ff69d40b7d9956821ab666cc" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" default))
+   '("130b47ad4ea2bc61b79e13ecb4a6e6b30351de0fea02e757f074477aa744128b" "c1de07961a3b5b49bfd50080e7811eea9c949526084df8d64ce1b4e0fdc076ff" "b97a01622103266c1a26a032567e02d920b2c697ff69d40b7d9956821ab666cc" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" default))
  '(magit-log-arguments '("--graph" "--color" "--decorate" "-n256"))
  '(magit-notes-arguments nil)
  '(magit-push-arguments '("--set-upstream"))

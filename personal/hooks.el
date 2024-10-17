@@ -28,3 +28,6 @@
               (ibuffer-do-sort-by-filename/process))))
 ;; init projectile
 (add-hook 'after-init-hook #'projectile-mode)
+
+
+(add-hook 'prog-mode-hook 'copilot-mode)

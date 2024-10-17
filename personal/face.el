@@ -11,18 +11,26 @@
 (prefer-coding-system 'utf-8)
 (blink-cursor-mode t)
 
+;; Set reusable font name variables
+(defvar my/fixed-width-font "JetBrains Mono"
+  "The font to use for monospaced (fixed width) text.")
+
+(defvar my/variable-width-font "Iosevka"
+  "The font to use for variable-pitch (document) text.")
 ;; nice fonts
-(setq mac-allow-anti-aliasing t)
-(set-frame-font "-PfEd-Monoid-normal-normal-semicondensed-13-*-*-*-*-c-60-iso10646-1")
+;;(set-frame-font "-PfEd-Monoid-normal-normal-semicondensed-13-*-*-*-*-c-60-iso10646-1")
 ;;(set-frame-font "-PfEd-Monoid HalfLoose-normal-normal-semicondensed-*-*-*-*-*-*-0-iso10646-1")
-(set-face-attribute 'default nil :height 180)
+(set-face-attribute 'default nil :font my/fixed-width-font :weight 'light :height 180)
+(set-face-attribute 'fixed-pitch nil :font my/fixed-width-font :weight 'light :height 190)
+(set-face-attribute 'variable-pitch nil :font my/variable-width-font :weight 'light :height 1.3)
+;;(set-face-attribute 'default nil :height 180)
 
 ;; interpret and use ansi color codes in shell output windows
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 
 ;; Theme
-(load-theme 'creamsody)
-(creamsody-modeline-one)
+(load-theme 'doom-palenight)
+;(creamsody-modeline-one)
 
 (set-cursor-color "#e47133")
 ;; no tabs
@@ -87,3 +95,7 @@
           (run-with-idle-timer 0.1 nil
                                (lambda (fg) (set-face-foreground 'mode-line fg))
                                orig-fg))))
+;; Global 80 column marker
+(setq display-fill-column-indicator-column 80)
+(setq-default display-fill-column-indicator-column 80)
+(global-display-fill-column-indicator-mode t)

@@ -1,1 +1,1 @@
-("~/.emacs.d/" "~/dot-files/")
+("~/.emacs.d/" "~/projects/portals/" "~/projects/backbone/" "~/dot-files/" "~/projects/imei-gen/" "~/projects/docs/" "~/aoc2023/" "~/rails/" "~/projects/.github/" "~/projects/infrastructure/")

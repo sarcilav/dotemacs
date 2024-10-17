@@ -31,3 +31,10 @@
 ;; replace ibuffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
+;; accept completion
+(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+
+;; list all solutions
+(define-key copilot-completion-map (kbd "<backtab>") 'copilot-panel-complete)
+
+

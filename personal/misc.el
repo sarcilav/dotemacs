@@ -67,3 +67,11 @@
                                  ("-o" "UserKnownHostsFile=/dev/null")
                                  ("-o" "StrictHostKeyChecking=no")))
     (tramp-default-port         22)))
+
+(require 'quelpa)
+(require 'quelpa-use-package)
+(use-package copilot
+  :quelpa (copilot :fetcher github
+                   :repo "zerolfx/copilot.el"
+                   :branch "main"
+                   :files ("dist" "*.el")))

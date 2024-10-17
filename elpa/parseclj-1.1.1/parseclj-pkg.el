@@ -1,0 +1,2 @@
+;; Generated package description from parseclj.el  -*- no-byte-compile: t -*-
+(define-package "parseclj" "1.1.1" "Clojure/EDN parser" '((emacs "25")) :commit "6af22372e0fe14df882dd300b22b12ba2d7e00b0" :url "https://elpa.nongnu.org/nongnu/parseclj.html" :authors '(("Arne Brasseur" . "arne@arnebrasseur.net")) :maintainer '("Arne Brasseur" . "arne@arnebrasseur.net") :keywords '("lisp" "clojure" "edn" "parser"))

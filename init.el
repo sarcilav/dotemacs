@@ -48,14 +48,14 @@
  '(magit-notes-arguments nil)
  '(magit-push-arguments '("--set-upstream"))
  '(package-selected-packages
-   '(forge doom-themes visual-fill-column org-present typescript-mode
-           quelpa quelpa-use-package ssh-agency fzf creamsody-theme
-           slime ag lua-mode paredit cider yaml-mode web-mode
-           terraform-mode rainbow-identifiers rainbow-delimiters
-           pretty-mode pretty-lambdada markdown-mode magit ibuffer-vc
-           handlebars-sgml-mode handlebars-mode haml-mode go-mode
-           elm-mode csharp-mode color-theme-sanityinc-tomorrow
-           coffee-mode clojurescript-mode circe))
+   '(ag cider circe clojurescript-mode coffee-mode
+        color-theme-sanityinc-tomorrow creamsody-theme csharp-mode
+        doom-themes elm-mode forge fzf go-mode haml-mode
+        handlebars-mode handlebars-sgml-mode ibuffer-vc lua-mode magit
+        markdown-mode org-present paredit pretty-lambdada pretty-mode
+        quelpa quelpa-use-package rainbow-delimiters
+        rainbow-identifiers rust-mode slime ssh-agency terraform-mode
+        typescript-mode visual-fill-column web-mode yaml-mode))
  '(safe-local-variable-values '((encoding . utf-8)))
  '(typescript-indent-level 2))
 (custom-set-faces

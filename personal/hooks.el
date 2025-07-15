@@ -16,6 +16,13 @@
 ;; Use fmt automagically
 (add-hook 'before-save-hook 'gofmt-before-save)
 
+;; rust hook and fmt
+(add-hook 'rust-mode-hook
+          (lambda () (setq indent-tabs-mode nil)))
+(add-hook 'rust-mode-hook
+          (lambda () (prettify-symbols-mode)))
+(setq rust-format-on-save t)
+
 ;; remove yas from term, to avoid keybinding problems
 (add-hook 'term-mode-hook (lambda()
                             (yas-minor-mode -1)))

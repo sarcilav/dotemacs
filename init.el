@@ -36,12 +36,26 @@
  ;; If there is more than one, they won't work right.
  '(coffee-tab-width 2)
  '(custom-safe-themes
-   '("02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" "130b47ad4ea2bc61b79e13ecb4a6e6b30351de0fea02e757f074477aa744128b" "c1de07961a3b5b49bfd50080e7811eea9c949526084df8d64ce1b4e0fdc076ff" "b97a01622103266c1a26a032567e02d920b2c697ff69d40b7d9956821ab666cc" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" default))
+   '("986cfa891116be38a60d1e82d820965249ea44e0d6348634a40ef6827f27bbb0"
+     "5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874"
+     "130b47ad4ea2bc61b79e13ecb4a6e6b30351de0fea02e757f074477aa744128b"
+     "c1de07961a3b5b49bfd50080e7811eea9c949526084df8d64ce1b4e0fdc076ff"
+     "b97a01622103266c1a26a032567e02d920b2c697ff69d40b7d9956821ab666cc"
+     "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a"
+     "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58"
+     default))
  '(magit-log-arguments '("--graph" "--color" "--decorate" "-n256"))
  '(magit-notes-arguments nil)
  '(magit-push-arguments '("--set-upstream"))
  '(package-selected-packages
-   '(doom-themes visual-fill-column org-present typescript-mode quelpa quelpa-use-package ssh-agency fzf creamsody-theme slime ag lua-mode paredit cider yaml-mode web-mode terraform-mode rainbow-identifiers rainbow-delimiters pretty-mode pretty-lambdada markdown-mode magit ibuffer-vc handlebars-sgml-mode handlebars-mode haml-mode go-mode elm-mode csharp-mode color-theme-sanityinc-tomorrow coffee-mode clojurescript-mode circe))
+   '(forge doom-themes visual-fill-column org-present typescript-mode
+           quelpa quelpa-use-package ssh-agency fzf creamsody-theme
+           slime ag lua-mode paredit cider yaml-mode web-mode
+           terraform-mode rainbow-identifiers rainbow-delimiters
+           pretty-mode pretty-lambdada markdown-mode magit ibuffer-vc
+           handlebars-sgml-mode handlebars-mode haml-mode go-mode
+           elm-mode csharp-mode color-theme-sanityinc-tomorrow
+           coffee-mode clojurescript-mode circe))
  '(safe-local-variable-values '((encoding . utf-8)))
  '(typescript-indent-level 2))
 (custom-set-faces
@@ -51,8 +65,6 @@
  ;; If there is more than one, they won't work right.
  )
 (setq magit-last-seen-setup-instructions "1.4.0")
-(require 'pretty-lambdada)
-(pretty-lambda-for-modes)
 
 ;; Custom 'files'
 (require 'multi-term)

@@ -18,8 +18,6 @@
 (defvar my/variable-width-font "Iosevka"
   "The font to use for variable-pitch (document) text.")
 ;; nice fonts
-;;(set-frame-font "-PfEd-Monoid-normal-normal-semicondensed-13-*-*-*-*-c-60-iso10646-1")
-;;(set-frame-font "-PfEd-Monoid HalfLoose-normal-normal-semicondensed-*-*-*-*-*-*-0-iso10646-1")
 (set-face-attribute 'default nil :font my/fixed-width-font :weight 'light :height 180)
 (set-face-attribute 'fixed-pitch nil :font my/fixed-width-font :weight 'light :height 190)
 (set-face-attribute 'variable-pitch nil :font my/variable-width-font :weight 'light :height 1.3)
@@ -29,8 +27,7 @@
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 
 ;; Theme
-(load-theme 'doom-palenight)
-;(creamsody-modeline-one)
+(load-theme 'creamsody)
 
 (set-cursor-color "#e47133")
 ;; no tabs

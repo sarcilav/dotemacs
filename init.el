@@ -88,7 +88,8 @@
   :config
   (setenv "ANTHROPIC_API_KEY" (anthropic-api-key))
   (setenv "OPENAI_API_KEY" (openai-api-key))
+  (setenv "DEEPSEEK_API_KEY" (deepseek-api-key))
   :custom
   ; See the Configuration section below`'
   (aidermacs-default-chat-mode 'architect)
-  (aidermacs-default-model "openai/gpt-4o-mini"))
+  (aidermacs-default-model "deepseek/deepseek-coder"))

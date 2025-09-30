@@ -6,3 +6,4 @@ eln-cache/
 transient/
 forge-database.sqlite
 personal/keys.*
+.aider*

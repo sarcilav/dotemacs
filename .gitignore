@@ -5,3 +5,4 @@ tramp
 eln-cache/
 transient/
 forge-database.sqlite
+personal/keys.*

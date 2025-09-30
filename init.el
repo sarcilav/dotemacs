@@ -1,6 +1,6 @@
 (add-to-list 'load-path "~/.emacs.d/personal/")
 
-(load "misc.el")
+(load "misc")
 ;;(server-start)
 
 ;; Start ido
@@ -49,7 +49,7 @@
  '(magit-notes-arguments nil)
  '(magit-push-arguments '("--set-upstream"))
  '(package-selected-packages
-   '(ag cider circe clojurescript-mode coffee-mode
+   '(ag aidermacs cider circe clojurescript-mode coffee-mode
         color-theme-sanityinc-tomorrow creamsody-theme csharp-mode
         doom-themes elm-mode forge fzf go-mode haml-mode
         handlebars-mode handlebars-sgml-mode ibuffer-vc lua-mode magit
@@ -72,12 +72,23 @@
 (setq multi-term-program "/usr/bin/bash")
 (setq multi-term-program-switches "--login")
 
-(load "personal.el")
-(load "face.el")
-(load "org-presentations.el")
-(load "bindings.el")
-(load "modes.el")
-(load "hooks.el")
+(load "personal")
+(load "face")
+(load "org-presentations")
+(load "bindings")
+(load "modes")
+(load "hooks")
 (setq projectile-completion-system 'ido)
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
+
+(load "keys")
+(use-package aidermacs
+  :bind (("C-c a" . aidermacs-transient-menu))
+  :config
+  (setenv "ANTHROPIC_API_KEY" (anthropic-api-key))
+  (setenv "OPENAI_API_KEY" (openai-api-key))
+  :custom
+  ; See the Configuration section below`'
+  (aidermacs-default-chat-mode 'architect)
+  (aidermacs-default-model "openai/gpt-4o-mini"))

@@ -68,7 +68,3 @@
                                  ("-o" "StrictHostKeyChecking=no")))
     (tramp-default-port         22)))
 
-(use-package copilot
-  :vc (:url "https://github.com/copilot-emacs/copilot.el"
-            :rev :newest
-            :branch "main"))

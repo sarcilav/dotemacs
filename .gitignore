@@ -2,3 +2,6 @@
 eshell/
 ido.last
 tramp
+eln-cache/
+transient/
+forge-database.sqlite

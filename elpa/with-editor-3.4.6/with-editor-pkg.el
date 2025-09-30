@@ -1,0 +1,2 @@
+;; Generated package description from with-editor.el  -*- no-byte-compile: t -*-
+(define-package "with-editor" "3.4.6" "Use the Emacsclient as $EDITOR" '((emacs "26.1") (compat "30.1")) :commit "87a384a0e59260cca41ca8831d98e195b1ec8ada" :authors '(("Jonas Bernoulli" . "emacs.with-editor@jonas.bernoulli.dev")) :maintainer '("Jonas Bernoulli" . "emacs.with-editor@jonas.bernoulli.dev") :keywords '("processes" "terminals") :url "https://github.com/magit/with-editor")

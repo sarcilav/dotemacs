@@ -37,4 +37,4 @@
 (add-hook 'after-init-hook #'projectile-mode)
 
 
-(add-hook 'prog-mode-hook 'copilot-mode)
+;;(add-hook 'prog-mode-hook 'copilot-mode)

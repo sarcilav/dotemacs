@@ -1,0 +1,2 @@
+;; Generated package description from magit-section.el  -*- mode: lisp-data; no-byte-compile: t -*-
+(define-package "magit-section" "4.4.0" "Sections for read-only buffers" '((emacs "28.1") (compat "30.1") (cond-let "0.1") (llama "1.0") (seq "2.24")) :commit "dc0094bd88a5307fdfa1c2a48f3ec5b33891f1f0" :authors '(("Jonas Bernoulli" . "emacs.magit@jonas.bernoulli.dev")) :maintainer '("Jonas Bernoulli" . "emacs.magit@jonas.bernoulli.dev") :keywords '("tools") :url "https://github.com/magit/magit")

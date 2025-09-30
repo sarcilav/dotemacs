@@ -36,7 +36,8 @@
  ;; If there is more than one, they won't work right.
  '(coffee-tab-width 2)
  '(custom-safe-themes
-   '("986cfa891116be38a60d1e82d820965249ea44e0d6348634a40ef6827f27bbb0"
+   '("41d60687e37fb8441f3ebfbefddb2cd1ff480432abe1d3848b28e356d12241ab"
+     "986cfa891116be38a60d1e82d820965249ea44e0d6348634a40ef6827f27bbb0"
      "5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874"
      "130b47ad4ea2bc61b79e13ecb4a6e6b30351de0fea02e757f074477aa744128b"
      "c1de07961a3b5b49bfd50080e7811eea9c949526084df8d64ce1b4e0fdc076ff"

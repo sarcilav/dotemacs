@@ -71,6 +71,20 @@
 (require 'multi-term)
 (setq multi-term-program "/usr/bin/bash")
 (setq multi-term-program-switches "--login")
+(defun my-term-filter-osc3008 (proc string)
+  "Filter out OSC 3008 escape sequences from STRING in PROC buffers."
+  (when (and string (stringp string))
+    (let ((clean (replace-regexp-in-string "\033]3008;.*?\033\\\\" "" string)))
+      (term-emulate-terminal proc clean))))
+
+(defun my-term-attach-filter ()
+  "Attach OSC 3008 filtering process filter once PROC exists."
+  (let ((proc (get-buffer-process (current-buffer))))
+    (when (process-live-p proc)
+      (set-process-filter proc #'my-term-filter-osc3008))))
+
+(add-hook 'term-exec-hook #'my-term-attach-filter)
+
 
 (load "personal")
 (load "face")

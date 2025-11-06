@@ -13,17 +13,18 @@
 (setq user-full-name "Sebastian Arcila-Valenzuela")
 
 ;; set path
-
 (let ((path))
-  (setq path (concat "/usr/local/bin:"
+  (setq path (concat (getenv "PATH")
+                     "/usr/local/bin:"
                      "/usr/local/sbin:"
                      "/usr/bin:"
                      "/bin:"
                      "/usr/sbin:"
                      "/sbin:"
                      "/usr/texbin:"
-                     "~/.rvm/bin:"))
+                     "~/.local/bin:"))
   (setenv "PATH" path))
+(setq exec-path (append exec-path '("~/.local/bin")))
 (setq-default shell-file-name "/usr/bin/bash")
 
 

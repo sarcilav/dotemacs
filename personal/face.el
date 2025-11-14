@@ -55,6 +55,12 @@
 ;; change js indent
 (setq js-indent-level 2)
 
+;; shell script indent mode
+(setq sh-basic-offset 2)
+
+;; css indent
+(setq css-indent-offset 2)
+
 ;; Ibuffer
 ;; Use human readable Size column instead of original one
 (require 'ibuffer)

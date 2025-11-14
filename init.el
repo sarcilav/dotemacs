@@ -85,7 +85,6 @@
 
 (add-hook 'term-exec-hook #'my-term-attach-filter)
 
-
 (load "personal")
 (load "face")
 (load "org-presentations")

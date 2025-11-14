@@ -1,0 +1,2 @@
+;; Generated package description from aidermacs.el  -*- no-byte-compile: t -*-
+(define-package "aidermacs" "1.6" "AI pair programming with Aider" '((emacs "26.1") (transient "0.3.0") (compat "30.0.2.0") (markdown-mode "2.7")) :commit "fc0f1381bb9398a2d5a76776bad812d7ce3507dc" :authors '(("Mingde Zeng" . "matthewzmd@posteo.net")) :maintainer '("Mingde Zeng" . "matthewzmd@posteo.net") :keywords '("ai" "emacs" "llm" "aider" "ai-pair-programming" "tools") :url "https://github.com/MatthewZMD/aidermacs")

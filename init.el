@@ -56,7 +56,8 @@
         markdown-mode org-present paredit pretty-lambdada pretty-mode
         quelpa quelpa-use-package rainbow-delimiters
         rainbow-identifiers rust-mode slime ssh-agency terraform-mode
-        typescript-mode visual-fill-column web-mode yaml-mode))
+        tree-sitter-indent tree-sitter-langs typescript-mode
+        visual-fill-column web-mode yaml-mode zig-mode))
  '(safe-local-variable-values '((encoding . utf-8)))
  '(typescript-indent-level 2))
 (custom-set-faces
@@ -105,4 +106,4 @@
   :custom
   ; See the Configuration section below`'
   (aidermacs-default-chat-mode 'architect)
-  (aidermacs-default-model "deepseek/deepseek-coder"))
+  (aidermacs-default-model "deepseek/deepseek-chat"))

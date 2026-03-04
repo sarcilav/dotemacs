@@ -22,9 +22,11 @@
                      "/usr/sbin:"
                      "/sbin:"
                      "/usr/texbin:"
-                     "~/.local/bin:"))
+                     "~/.local/bin:"
+                     "~/.local/share/mise/shims:"))
   (setenv "PATH" path))
 (setq exec-path (append exec-path '("~/.local/bin")))
+(setq exec-path (append exec-path '("~/.local/share/mise/shims")))
 (setq-default shell-file-name "/usr/bin/bash")
 
 

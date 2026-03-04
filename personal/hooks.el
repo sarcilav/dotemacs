@@ -15,6 +15,12 @@
   (setq-local standard-indent 2)
   (setq-local indent-tabs-mode nil))
 
+(defun my/setup-zig-mode ()
+  "Configure Zig mode with 2-space indentation."
+  (setq-local tab-width 2)
+  (setq-local standard-indent 2)
+  (setq-local indent-tabs-mode nil))
+
 (defun my/setup-rust-mode ()
   "Configure Rust mode with spaces and prettify symbols."
   (setq-local indent-tabs-mode nil)
@@ -42,6 +48,10 @@
   (add-hook 'go-mode-hook 'my/setup-go-mode))
 
 (add-hook 'before-save-hook 'gofmt-before-save)
+
+(when (fboundp 'zig-mode-hook)
+  (add-hook 'zig-mode-hook 'my/setup-zig-mode)
+  (add-hook 'zig-mode-hook 'zig-format-on-save-mode))
 
 (when (fboundp 'rust-mode-hook)
   (add-hook 'rust-mode-hook 'my/setup-rust-mode))

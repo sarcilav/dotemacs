@@ -64,13 +64,19 @@ With a non-numeric prefix ARG, create a new project terminal."
 (define-key eat-semi-char-mode-map (kbd "M-]") #'my/eat-next)
 (define-key eat-semi-char-mode-map (kbd "M-[") #'my/eat-prev)
 
+(defun my/eat-alert-default-style ()
+  "Return the preferred alert style for eat supervisor notifications."
+  (cond ((and (eq system-type 'darwin)
+              (executable-find "terminal-notifier"))
+         'notifier)
+        ((eq system-type 'darwin)    'osx-notifier)
+        ((eq system-type 'gnu/linux) 'libnotify)
+        (t                           'message)))
+
 (require 'eat-supervisor)
 (if (require 'alert nil t)
     (progn
-      (setq alert-default-style
-            (cond ((eq system-type 'darwin)    'osx-notifier)
-                  ((eq system-type 'gnu/linux) 'libnotify)
-                  (t                           'message)))
+      (setq alert-default-style (my/eat-alert-default-style))
       (my/eat-supervisor-mode 1))
   (message "eat-supervisor: alert.el not installed; supervisor mode left off."))
 

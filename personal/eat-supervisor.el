@@ -42,24 +42,61 @@
   "If output was seen within this many seconds, allow :working state."
   :type 'number :group 'my/eat-sup)
 
+(defcustom my/eat-sup-working-hold 6.0
+  "Seconds to keep working after the last working title or output marker."
+  :type 'number :group 'my/eat-sup)
+
 (defvar my/eat-sup-working-re "esc to interrupt\\|✽ "
-  "Regex matching any coding-agent working indicator.")
+  "Regex matching any coding-agent working indicator (global fallback for agents
+without a per-agent :working list in `my/eat-sup-patterns').")
 
 (defvar my/eat-sup-patterns
   '((claude
      :detect ("Claude Code\\|claude\\.ai\\|anthropic")
+     :title-working ("✻\\|✽"
+                     "\\(?:^\\|[[:space:]]\\)[-+*][[:space:]]+[[:alpha:]][[:alpha:]-]*…")
+     :title-awaiting-approval ("Do you want to proceed\\|Esc to cancel.*Tab to amend")
+     :working ("[Ee]sc to interrupt"
+               "[Ww]orking[.…]")
      :awaiting-approval ("Esc to cancel.*Tab to amend"
                          "Do you want to proceed"
                          "❯\\s-*1\\."))
     (codex
      :detect ("codex\\|OpenAI Codex")
+     :title-working ("\\(?:^\\|[[:space:][:punct:]]\\)\\(?:[Tt]hinking\\|[Ww]orking\\|[Rr]unning\\)\\(?:[[:space:][:punct:]]\\|$\\)"
+                     "⠋\\|⠙\\|⠹\\|⠸\\|⠼\\|⠴\\|⠦\\|⠧\\|⠇\\|⠏")
+     :title-awaiting-approval ("[Aa]ction [Rr]equired"
+                               "Allow .*\\?"
+                               "\\[\\s-*!\\s-*\\]")
      :awaiting-approval ("enter to submit.*esc to cancel"
+                         "Press enter to confirm or esc*"
+                         "tab to add notes | enter to submit answer | esc to *"
+                         "[Aa]ction [Rr]equired"
                          "›\\s-*1\\.\\s-*Allow"))
     (shell
      :idle ("[$#%❯>] *\\'")))
-  "Per-agent regex patterns. Each entry is (AGENT . PLIST), where PLIST may
-contain :detect, :awaiting-approval, :idle — each a list of regexes.
-Agent identity is set by shell-integration advice; :detect is a cold-start fallback.")
+  "Per-agent regex patterns.
+Each entry is (AGENT . PLIST).  PLIST may contain :detect, :title-working,
+:title-awaiting-approval, :working, :awaiting-approval, and :idle, each with a
+list of regexes.  Agent identity is set by shell-integration advice; :detect is
+a cold-start fallback.  Agents without :working fall back to
+`my/eat-sup-working-re'.")
+
+;;; Buffer-local state
+
+(defvar-local my/eat-sup--agent 'unknown)
+(defvar-local my/eat-sup--state :unknown)
+(defvar-local my/eat-sup--last-output 0.0)
+(defvar-local my/eat-sup--last-working-marker 0.0)
+(defvar-local my/eat-sup--last-state :unknown)
+(defvar-local my/eat-sup--state-since 0.0)
+(defvar-local my/eat-sup--idle-alerted nil)
+(defvar-local my/eat-sup--session-active nil
+  "Non-nil while a coding-agent command is running per shell-integration.
+Set by `my/eat-sup--on-set-cmd'; cleared by `my/eat-sup--on-new-prompt'.
+Guards idle alerts so text-detection flicker cannot fire spurious done alerts.")
+(defvar-local my/eat-sup--pending-idle-agent nil
+  "Agent whose completion should be reported when the prompt returns.")
 
 ;;; Shell-integration advice — agent identity
 
@@ -69,24 +106,24 @@ Agent identity is set by shell-integration advice; :detect is a cold-start fallb
                         (decode-coding-string
                          (base64-decode-string cmd)
                          locale-coding-system))))
-    (setq-local my/eat-sup--agent
-                (cond
-                 ((string-match-p "claude" command) 'claude)
-                 ((string-match-p "codex"  command) 'codex)
-                 (t 'shell)))))
+    (let ((agent (cond
+                  ((string-match-p "claude" command) 'claude)
+                  ((string-match-p "codex"  command) 'codex)
+                  (t 'shell))))
+      (setq-local my/eat-sup--agent          agent
+                  my/eat-sup--pending-idle-agent nil
+                  my/eat-sup--session-active (memq agent '(claude codex))
+                  my/eat-sup--last-working-marker 0.0))))
 
 (defun my/eat-sup--on-new-prompt ()
-  "Reset agent to shell when the prompt reappears after a command exits."
-  (setq-local my/eat-sup--agent 'shell))
-
-;;; Buffer-local state
-
-(defvar-local my/eat-sup--agent 'unknown)
-(defvar-local my/eat-sup--state :unknown)
-(defvar-local my/eat-sup--last-output 0.0)
-(defvar-local my/eat-sup--last-state :unknown)
-(defvar-local my/eat-sup--state-since 0.0)
-(defvar-local my/eat-sup--idle-alerted nil)
+  "Record agent completion before the shell prompt owns the buffer again.
+Sets `my/eat-sup--pending-idle-agent' whenever a coding-agent session ends so
+the done alert fires reliably regardless of whether working state was detected."
+  (when (memq my/eat-sup--agent '(claude codex))
+    (setq-local my/eat-sup--pending-idle-agent my/eat-sup--agent))
+  (setq-local my/eat-sup--agent          'shell
+              my/eat-sup--session-active nil
+              my/eat-sup--last-working-marker 0.0))
 
 ;;; Faces
 
@@ -109,6 +146,14 @@ Agent identity is set by shell-integration advice; :detect is a cold-start fallb
     (eat-term-filter-string
      (buffer-substring-no-properties (point) (point-max)))))
 
+(defun my/eat-sup--title ()
+  "Return the current Eat terminal title for this buffer, or nil."
+  (when (and (boundp 'eat-terminal) eat-terminal)
+    (ignore-errors
+      (let ((title (eat-term-title eat-terminal)))
+        (unless (string-empty-p title)
+          title)))))
+
 (defun my/eat-sup--match-any (regexes text)
   "Non-nil if any regex in REGEXES matches TEXT."
   (and regexes text
@@ -120,7 +165,9 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
 :detect text patterns for cold-start (e.g. supervisor enabled mid-session)."
   (if (not (eq my/eat-sup--agent 'unknown))
       my/eat-sup--agent
-    (let ((detect-text (my/eat-sup--tail my/eat-sup-detect-window)))
+    (let ((detect-text (concat (or (my/eat-sup--title) "")
+                               "\n"
+                               (my/eat-sup--tail my/eat-sup-detect-window))))
       (or
        (cl-loop for (agent . plist) in my/eat-sup-patterns
                 when (my/eat-sup--match-any (plist-get plist :detect) detect-text)
@@ -131,19 +178,44 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
          'shell)
        'unknown))))
 
+(defun my/eat-sup--awaiting-approval-p (plist title text)
+  "Return non-nil when PLIST, TITLE, or TEXT indicate an approval prompt."
+  (or (my/eat-sup--match-any (plist-get plist :title-awaiting-approval) title)
+      (my/eat-sup--match-any (plist-get plist :awaiting-approval) text)))
+
+(defun my/eat-sup--working-marker-p (plist title text)
+  "Return non-nil when PLIST, TITLE, or TEXT indicate active agent work."
+  (let ((agent-working (plist-get plist :working)))
+    (or (my/eat-sup--match-any (plist-get plist :title-working) title)
+        (if agent-working
+            (my/eat-sup--match-any agent-working text)
+          (and text (string-match-p my/eat-sup-working-re text))))))
+
+(defun my/eat-sup--working-held-p (now)
+  "Return non-nil when recent working evidence should still count at NOW."
+  (and (memq my/eat-sup--agent '(claude codex))
+       (> my/eat-sup--last-working-marker 0)
+       (< (- now my/eat-sup--last-working-marker) my/eat-sup-working-hold)
+       (< (- now my/eat-sup--last-output) my/eat-sup-working-grace)))
+
 (defun my/eat-sup--detect-state (agent)
   "Return the state keyword for the current buffer given AGENT."
-  (let ((plist (alist-get agent my/eat-sup-patterns))
-        (proc  (get-buffer-process (current-buffer))))
+  (let* ((plist         (alist-get agent my/eat-sup-patterns))
+         (proc          (get-buffer-process (current-buffer)))
+         (title         (my/eat-sup--title))
+         (working-text  (my/eat-sup--tail my/eat-sup-working-window))
+         (now           (float-time))
+         (working-p     (my/eat-sup--working-marker-p plist title working-text)))
+    (when (and working-p
+               (< (- now my/eat-sup--last-output) my/eat-sup-working-grace))
+      (setq-local my/eat-sup--last-working-marker now))
     (cond
      ((not (process-live-p proc)) :exited)
-     ((my/eat-sup--match-any (plist-get plist :awaiting-approval)
-                             (my/eat-sup--tail my/eat-sup-approval-window))
+     ((my/eat-sup--awaiting-approval-p
+       plist title (my/eat-sup--tail my/eat-sup-approval-window))
       :awaiting-approval)
-     ((and (string-match-p my/eat-sup-working-re
-                           (my/eat-sup--tail my/eat-sup-working-window))
-           (< (- (float-time) my/eat-sup--last-output)
-              my/eat-sup-working-grace))
+     ((and (or working-p (my/eat-sup--working-held-p now))
+           (< (- now my/eat-sup--last-output) my/eat-sup-working-grace))
       :working)
      (t :idle))))
 
@@ -151,19 +223,32 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
 
 (defun my/eat-sup--note-output ()
   "Record the timestamp of the latest terminal output."
-  (setq my/eat-sup--last-output (float-time)))
+  (let ((now (float-time)))
+    (setq-local my/eat-sup--last-output now)
+    (when (eq my/eat-sup--agent 'unknown)
+      (setq-local my/eat-sup--agent (my/eat-sup--detect-agent)))
+    (let ((plist (alist-get my/eat-sup--agent my/eat-sup-patterns)))
+      (when (and plist
+                 (my/eat-sup--working-marker-p
+                  plist
+                  (my/eat-sup--title)
+                  (my/eat-sup--tail my/eat-sup-working-window)))
+        (setq-local my/eat-sup--last-working-marker now)))))
 
 (defun my/eat-sup--init-buffer (proc)
   "Initialise supervisor state in PROC's buffer."
   (when-let ((buf (process-buffer proc)))
     (when (buffer-live-p buf)
       (with-current-buffer buf
-        (setq-local my/eat-sup--agent       'unknown
-                    my/eat-sup--state       :unknown
-                    my/eat-sup--last-output (float-time)
-                    my/eat-sup--last-state  :unknown
-                    my/eat-sup--state-since (float-time)
-                    my/eat-sup--idle-alerted nil)
+        (setq-local my/eat-sup--agent          'unknown
+                    my/eat-sup--state          :unknown
+                    my/eat-sup--last-output    (float-time)
+                    my/eat-sup--last-working-marker 0.0
+                    my/eat-sup--last-state     :unknown
+                    my/eat-sup--state-since    (float-time)
+                    my/eat-sup--idle-alerted   nil
+                    my/eat-sup--session-active nil
+                    my/eat-sup--pending-idle-agent nil)
         (add-hook 'eat-update-hook #'my/eat-sup--note-output nil t)))))
 
 (defun my/eat-sup--on-exit (proc)
@@ -200,7 +285,9 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
           (my/eat-sup--on-transition buf my/eat-sup--last-state new-state))
         (when (and (eq new-state :idle)
                    (not my/eat-sup--idle-alerted)
-                   (eq my/eat-sup--last-state :working)
+                   (not my/eat-sup--session-active)
+                   (or my/eat-sup--pending-idle-agent
+                       (memq my/eat-sup--last-state '(:working :awaiting-approval)))
                    (>= (- (float-time) my/eat-sup--state-since)
                        my/eat-sup-idle-debounce))
           (my/eat-sup--alert-idle buf)
@@ -218,12 +305,16 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
                :category 'eat-agent :severity 'high :buffer buf))))))
 
 (defun my/eat-sup--alert-idle (buf)
-  "Fire the debounced :working→:idle alert for BUF."
-  (let ((agent (buffer-local-value 'my/eat-sup--agent buf)))
-    (when (memq agent '(claude codex))
-      (alert (format "%s in %s — done"
-                     (capitalize (symbol-name agent)) (buffer-name buf))
-             :category 'eat-agent :severity 'normal :buffer buf))))
+  "Fire the debounced active-to-idle alert for BUF."
+  (with-current-buffer buf
+    (let ((agent (or my/eat-sup--pending-idle-agent my/eat-sup--agent)))
+      (when (memq agent '(claude codex))
+        (alert (format "%s in %s — done"
+                       (capitalize (symbol-name agent)) (buffer-name buf))
+               :category 'eat-agent :severity 'normal :buffer buf)
+        (when my/eat-sup--pending-idle-agent
+          (setq-local my/eat-sup--agent 'shell
+                      my/eat-sup--pending-idle-agent nil))))))
 
 ;;; Supervisor list buffer
 
@@ -295,6 +386,11 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
          ("CWD"     0 t)])
   (setq tabulated-list-entries #'my/eat-sup--list-entries)
   (tabulated-list-init-header))
+
+(defun my/eat-sup-debug-title ()
+  "Show the current Eat terminal title for the selected buffer."
+  (interactive)
+  (message "eat title: %s" (or (my/eat-sup--title) "")))
 
 ;;;###autoload
 (defun my/eat-supervisor ()

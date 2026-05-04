@@ -26,7 +26,7 @@
   "Seconds a buffer must remain :idle before the idle alert fires."
   :type 'number :group 'my/eat-sup)
 
-(defcustom my/eat-sup-working-window 5
+(defcustom my/eat-sup-working-window 15
   "Number of trailing lines scanned for :working markers."
   :type 'integer :group 'my/eat-sup)
 
@@ -38,24 +38,46 @@
   "Number of trailing lines scanned for agent detection."
   :type 'integer :group 'my/eat-sup)
 
-(defcustom my/eat-sup-working-grace 2.0
+(defcustom my/eat-sup-working-grace 30.0
   "If output was seen within this many seconds, allow :working state."
   :type 'number :group 'my/eat-sup)
 
+(defvar my/eat-sup-working-re "esc to interrupt\\|✽ "
+  "Regex matching any coding-agent working indicator.")
+
 (defvar my/eat-sup-patterns
   '((claude
-     ;; :detect must be claude-specific — "esc to interrupt" is shared with codex
      :detect ("Claude Code\\|claude\\.ai\\|anthropic")
-     :awaiting-approval ("Do you want to .*\\?[\n\r ]+❯?\\s-*1\\.\\s-")
-     :working ("esc to interrupt\\|⏵\\|⠋\\|⠙\\|⠹\\|⠸\\|⠼\\|⠴\\|⠦\\|⠧\\|⠇\\|⠏"))
+     :awaiting-approval ("Esc to cancel.*Tab to amend"
+                         "Do you want to proceed"
+                         "❯\\s-*1\\."))
     (codex
-     ;; CONFIRMED: codex working line `* Working (1m 45s * esc to interrupt)`
-     :working ("\\* Working ([0-9hms ]+\\* esc to interrupt"))
-     ;; TODO :detect, :awaiting-approval — fill in from a real codex session
+     :detect ("codex\\|OpenAI Codex")
+     :awaiting-approval ("enter to submit.*esc to cancel"
+                         "›\\s-*1\\.\\s-*Allow"))
     (shell
      :idle ("[$#%❯>] *\\'")))
   "Per-agent regex patterns. Each entry is (AGENT . PLIST), where PLIST may
-contain :detect, :awaiting-approval, :working, :idle — each a list of regexes.")
+contain :detect, :awaiting-approval, :idle — each a list of regexes.
+Agent identity is set by shell-integration advice; :detect is a cold-start fallback.")
+
+;;; Shell-integration advice — agent identity
+
+(defun my/eat-sup--on-set-cmd (cmd)
+  "Detect agent from shell-integration preexec CMD (base64-encoded)."
+  (when-let ((command (ignore-errors
+                        (decode-coding-string
+                         (base64-decode-string cmd)
+                         locale-coding-system))))
+    (setq-local my/eat-sup--agent
+                (cond
+                 ((string-match-p "claude" command) 'claude)
+                 ((string-match-p "codex"  command) 'codex)
+                 (t 'shell)))))
+
+(defun my/eat-sup--on-new-prompt ()
+  "Reset agent to shell when the prompt reappears after a command exits."
+  (setq-local my/eat-sup--agent 'shell))
 
 ;;; Buffer-local state
 
@@ -93,21 +115,21 @@ contain :detect, :awaiting-approval, :working, :idle — each a list of regexes.
        (cl-some (lambda (re) (string-match-p re text)) regexes)))
 
 (defun my/eat-sup--detect-agent ()
-  "Return the agent symbol for the current buffer."
-  (let ((detect-text (my/eat-sup--tail my/eat-sup-detect-window))
-        (work-text   (my/eat-sup--tail my/eat-sup-working-window)))
-    (or
-     (cl-loop for (agent . plist) in my/eat-sup-patterns
-              when (my/eat-sup--match-any (plist-get plist :detect) detect-text)
-              return agent)
-     (cl-loop for (agent . plist) in my/eat-sup-patterns
-              when (my/eat-sup--match-any (plist-get plist :working) work-text)
-              return agent)
-     (when (my/eat-sup--match-any
-            (plist-get (alist-get 'shell my/eat-sup-patterns) :idle)
-            (my/eat-sup--tail 1))
-       'shell)
-     'unknown)))
+  "Return the agent symbol for the current buffer.
+Prefers the buffer-local value set by shell-integration advice; falls back to
+:detect text patterns for cold-start (e.g. supervisor enabled mid-session)."
+  (if (not (eq my/eat-sup--agent 'unknown))
+      my/eat-sup--agent
+    (let ((detect-text (my/eat-sup--tail my/eat-sup-detect-window)))
+      (or
+       (cl-loop for (agent . plist) in my/eat-sup-patterns
+                when (my/eat-sup--match-any (plist-get plist :detect) detect-text)
+                return agent)
+       (when (my/eat-sup--match-any
+              (plist-get (alist-get 'shell my/eat-sup-patterns) :idle)
+              (my/eat-sup--tail 1))
+         'shell)
+       'unknown))))
 
 (defun my/eat-sup--detect-state (agent)
   "Return the state keyword for the current buffer given AGENT."
@@ -118,8 +140,8 @@ contain :detect, :awaiting-approval, :working, :idle — each a list of regexes.
      ((my/eat-sup--match-any (plist-get plist :awaiting-approval)
                              (my/eat-sup--tail my/eat-sup-approval-window))
       :awaiting-approval)
-     ((and (my/eat-sup--match-any (plist-get plist :working)
-                                  (my/eat-sup--tail my/eat-sup-working-window))
+     ((and (string-match-p my/eat-sup-working-re
+                           (my/eat-sup--tail my/eat-sup-working-window))
            (< (- (float-time) my/eat-sup--last-output)
               my/eat-sup-working-grace))
       :working)
@@ -167,7 +189,8 @@ contain :detect, :awaiting-approval, :working, :idle — each a list of regexes.
   "Recompute agent and state for every live eat buffer; fire transitions."
   (dolist (buf (my/eat-sup--alive-buffers))
     (with-current-buffer buf
-      (setq my/eat-sup--agent (my/eat-sup--detect-agent))
+      (when (eq my/eat-sup--agent 'unknown)
+        (setq my/eat-sup--agent (my/eat-sup--detect-agent)))
       (let ((new-state (my/eat-sup--detect-state my/eat-sup--agent)))
         (unless (eq new-state my/eat-sup--state)
           (setq my/eat-sup--last-state  my/eat-sup--state
@@ -340,6 +363,8 @@ contain :detect, :awaiting-approval, :working, :idle — each a list of regexes.
     (require 'alert)
     (add-hook 'eat-exec-hook #'my/eat-sup--init-buffer)
     (add-hook 'eat-exit-hook #'my/eat-sup--on-exit)
+    (advice-add 'eat--set-cmd           :after #'my/eat-sup--on-set-cmd)
+    (advice-add 'eat--before-new-prompt :after #'my/eat-sup--on-new-prompt)
     (dolist (buf (my/eat-sup--alive-buffers))
       (when-let ((proc (get-buffer-process buf)))
         (my/eat-sup--init-buffer proc)))
@@ -355,6 +380,8 @@ contain :detect, :awaiting-approval, :working, :idle — each a list of regexes.
    (t
     (remove-hook 'eat-exec-hook #'my/eat-sup--init-buffer)
     (remove-hook 'eat-exit-hook #'my/eat-sup--on-exit)
+    (advice-remove 'eat--set-cmd           #'my/eat-sup--on-set-cmd)
+    (advice-remove 'eat--before-new-prompt #'my/eat-sup--on-new-prompt)
     (when (timerp my/eat-sup--timer)
       (cancel-timer my/eat-sup--timer)
       (setq my/eat-sup--timer nil))

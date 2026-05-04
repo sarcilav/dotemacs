@@ -36,7 +36,8 @@
  ;; If there is more than one, they won't work right.
  '(coffee-tab-width 2)
  '(custom-safe-themes
-   '("41d60687e37fb8441f3ebfbefddb2cd1ff480432abe1d3848b28e356d12241ab"
+   '("02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644"
+     "41d60687e37fb8441f3ebfbefddb2cd1ff480432abe1d3848b28e356d12241ab"
      "986cfa891116be38a60d1e82d820965249ea44e0d6348634a40ef6827f27bbb0"
      "5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874"
      "130b47ad4ea2bc61b79e13ecb4a6e6b30351de0fea02e757f074477aa744128b"
@@ -51,7 +52,7 @@
  '(package-selected-packages
    '(ag aidermacs cider circe clojurescript-mode coffee-mode
         color-theme-sanityinc-tomorrow creamsody-theme csharp-mode
-        doom-themes elm-mode forge fzf go-mode haml-mode
+        doom-themes eat elm-mode forge fzf go-mode haml-mode
         handlebars-mode handlebars-sgml-mode ibuffer-vc lua-mode magit
         markdown-mode org-present paredit pretty-lambdada pretty-mode
         quelpa quelpa-use-package rainbow-delimiters
@@ -68,25 +69,8 @@
  )
 (setq magit-last-seen-setup-instructions "1.4.0")
 
-;; Custom 'files'
-(require 'multi-term)
-(setq multi-term-program "/usr/bin/bash")
-(setq multi-term-program-switches "--login")
-(defun my-term-filter-osc3008 (proc string)
-  "Filter out OSC 3008 escape sequences from STRING in PROC buffers."
-  (when (and string (stringp string))
-    (let ((clean (replace-regexp-in-string "\033]3008;.*?\033\\\\" "" string)))
-      (term-emulate-terminal proc clean))))
-
-(defun my-term-attach-filter ()
-  "Attach OSC 3008 filtering process filter once PROC exists."
-  (let ((proc (get-buffer-process (current-buffer))))
-    (when (process-live-p proc)
-      (set-process-filter proc #'my-term-filter-osc3008))))
-
-(add-hook 'term-exec-hook #'my-term-attach-filter)
-
 (load "personal")
+(load "eat-term")
 (load "face")
 (load "org-presentations")
 (load "bindings")

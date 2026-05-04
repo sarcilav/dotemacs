@@ -50,7 +50,7 @@
  '(magit-notes-arguments nil)
  '(magit-push-arguments '("--set-upstream"))
  '(package-selected-packages
-   '(ag aidermacs cider circe clojurescript-mode coffee-mode
+   '(ag aidermacs alert cider circe clojurescript-mode coffee-mode
         color-theme-sanityinc-tomorrow creamsody-theme csharp-mode
         doom-themes eat elm-mode forge fzf go-mode haml-mode
         handlebars-mode handlebars-sgml-mode ibuffer-vc lua-mode magit

@@ -1,7 +1,7 @@
 ;; Platform-specific configuration
-(when (eq system-type 'darwin)
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'option))
+;; (when (eq system-type 'darwin)
+;;  (setq mac-command-modifier 'meta)
+;;  (setq mac-option-modifier 'option))
 
 (defun my/setup-global-keybindings ()
   "Set up all global keybindings with proper error handling."
@@ -36,8 +36,9 @@
     (global-set-key "\M-s\M-s" 'ag-project-regexp))
 
   ;; Terminal
-  (when (fboundp 'multi-term)
-    (global-set-key "\C-c\C-\M-t" 'multi-term))
+  (when (fboundp 'my/eat)
+    (global-set-key (kbd "C-c C-M-t") #'my/eat)
+    (global-set-key (kbd "C-c C-M-p") #'my/eat-project))
 
   ;; Buffer management
   (global-set-key (kbd "C-x C-b") 'ibuffer))

@@ -13,23 +13,24 @@
 (setq user-full-name "Sebastian Arcila-Valenzuela")
 
 ;; set path
-(let ((path))
-  (setq path (concat (getenv "PATH")
-                     "/usr/local/bin:"
-                     "/usr/local/sbin:"
-                     "/usr/bin:"
-                     "/bin:"
-                     "/usr/sbin:"
-                     "/sbin:"
-                     "/usr/texbin:"
-                     "~/.local/bin:"
-                     "~/.local/share/mise/shims:"
-                     "/opt/homebrew/bin/"))
+(let ((path (concat (getenv "PATH")
+                    "/usr/local/bin:"
+                    "/usr/local/sbin:"
+                    "/usr/bin:"
+                    "/bin:"
+                    "/usr/sbin:"
+                    "/sbin:"
+                    "/usr/texbin:"
+                    "~/.local/bin:"
+                    "~/.local/share/mise/shims:")))
+  (when (eq system-type 'darwin)
+    (setq path (concat path "/opt/homebrew/bin/")))
   (setenv "PATH" path))
 (setq exec-path (append exec-path '("~/.local/bin")))
 (setq exec-path (append exec-path '("~/.local/share/mise/shims")))
-(setq exec-path (append exec-path '("/opt/homebrew/bin/")))
-(setq-default shell-file-name "/opt/homebrew/bin/bash")
+(when (eq system-type 'darwin)
+  (setq exec-path (append exec-path '("/opt/homebrew/bin/")))
+  (setq-default shell-file-name "/opt/homebrew/bin/bash"))
 
 
 (setq dotfiles-dir (file-name-directory

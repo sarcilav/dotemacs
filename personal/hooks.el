@@ -58,8 +58,7 @@
 
 (setq rust-format-on-save t)
 
-(when (fboundp 'term-mode-hook)
-  (add-hook 'term-mode-hook 'my/disable-yasnippet-in-term))
+(add-hook 'eat-mode-hook #'my/disable-yasnippet-in-term)
 
 (when (fboundp 'ibuffer-hook)
   (add-hook 'ibuffer-hook 'my/setup-ibuffer))

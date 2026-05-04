@@ -23,11 +23,13 @@
                      "/sbin:"
                      "/usr/texbin:"
                      "~/.local/bin:"
-                     "~/.local/share/mise/shims:"))
+                     "~/.local/share/mise/shims:"
+                     "/opt/homebrew/bin/"))
   (setenv "PATH" path))
 (setq exec-path (append exec-path '("~/.local/bin")))
 (setq exec-path (append exec-path '("~/.local/share/mise/shims")))
-(setq-default shell-file-name "/usr/bin/bash")
+(setq exec-path (append exec-path '("/opt/homebrew/bin/")))
+(setq-default shell-file-name "/opt/homebrew/bin/bash")
 
 
 (setq dotfiles-dir (file-name-directory

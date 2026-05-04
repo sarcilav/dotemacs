@@ -27,7 +27,8 @@
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 
 ;; Theme
-(load-theme 'creamsody)
+;;(load-theme 'creamsody)
+(load-theme 'doom-one)
 
 (set-cursor-color "#e47133")
 ;; no tabs

@@ -21,13 +21,19 @@
                     "/usr/sbin:"
                     "/sbin:"
                     "/usr/texbin:"
-                    "~/.local/bin:"
-                    "~/.local/share/mise/shims:")))
+                    "~/.local/bin:")))
+  (when (file-directory-p (expand-file-name "~/.asdf/shims"))
+    (setq path (concat path "~/.asdf/shims:")))
+  (when (file-directory-p (expand-file-name "~/.local/share/mise/shims"))
+    (setq path (concat path "~/.local/share/mise/shims:")))
   (when (eq system-type 'darwin)
     (setq path (concat path "/opt/homebrew/bin/")))
   (setenv "PATH" path))
 (setq exec-path (append exec-path '("~/.local/bin")))
-(setq exec-path (append exec-path '("~/.local/share/mise/shims")))
+(when (file-directory-p (expand-file-name "~/.asdf/shims"))
+  (setq exec-path (append exec-path '("~/.asdf/shims"))))
+(when (file-directory-p (expand-file-name "~/.local/share/mise/shims"))
+  (setq exec-path (append exec-path '("~/.local/share/mise/shims"))))
 (when (eq system-type 'darwin)
   (setq exec-path (append exec-path '("/opt/homebrew/bin/")))
   (setq-default shell-file-name "/opt/homebrew/bin/bash"))

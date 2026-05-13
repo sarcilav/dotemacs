@@ -1,6 +1,12 @@
 (require 'eat)
 
-(setq eat-kill-buffer-on-exit t)
+(setq eat-kill-buffer-on-exit t
+      ;; Eat implements terminal-requested cursor blink by toggling a buffer-local
+      ;; timer that calls `redraw-frame', which can make GUI frames flicker.
+      eat-enable-blinking-text nil
+      eat-very-visible-cursor-type (list (car eat-default-cursor-type) nil nil)
+      eat-very-visible-vertical-bar-cursor-type '(bar nil nil)
+      eat-very-visible-horizontal-bar-cursor-type '(hbar nil nil))
 
 (defvar my/eat-shell "/opt/homebrew/bin/bash --login"
   "Shell command for eat terminals. Multi-word is fine: eat wraps it in `sh -c'.")

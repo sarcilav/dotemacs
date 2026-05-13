@@ -439,14 +439,16 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
 
 (defun my/eat-sup--update-display ()
   "Refresh visible supervisor buffer (if any) and the mode-line indicator."
-  (setq my/eat-sup--mode-line-string (my/eat-sup--build-mode-line))
+  (let ((mode-line-string (my/eat-sup--build-mode-line)))
+    (unless (equal mode-line-string my/eat-sup--mode-line-string)
+      (setq my/eat-sup--mode-line-string mode-line-string)
+      (force-mode-line-update t)))
   (when-let ((buf (get-buffer my/eat-supervisor-buffer-name)))
     (when (get-buffer-window buf 'visible)
       (with-current-buffer buf
         (let ((point (point)))
           (tabulated-list-revert)
-          (goto-char (min point (point-max)))))))
-  (force-mode-line-update t))
+          (goto-char (min point (point-max))))))))
 
 ;;; Global minor mode
 

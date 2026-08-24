@@ -10,6 +10,7 @@
 ;; my/eat-buffer-list lives in eat-term.el; declare to silence the byte-compiler
 ;; if eat-supervisor is loaded before eat-term has registered it.
 (defvar my/eat-buffer-list)
+(defvar my/eat--resizing nil)
 
 ;;; Customization
 
@@ -91,6 +92,10 @@ a cold-start fallback.  Agents without :working fall back to
 (defvar-local my/eat-sup--last-state :unknown)
 (defvar-local my/eat-sup--state-since 0.0)
 (defvar-local my/eat-sup--idle-alerted nil)
+(defvar-local my/eat-sup--command nil
+  "Decoded shell command currently reported by Eat shell integration.")
+(defvar-local my/eat-sup--command-running nil
+  "Non-nil while Eat shell integration reports a command is running.")
 (defvar-local my/eat-sup--session-active nil
   "Non-nil while a coding-agent command is running per shell-integration.
 Set by `my/eat-sup--on-set-cmd'; cleared by `my/eat-sup--on-new-prompt'.
@@ -98,19 +103,36 @@ Guards idle alerts so text-detection flicker cannot fire spurious done alerts.")
 (defvar-local my/eat-sup--pending-idle-agent nil
   "Agent whose completion should be reported when the prompt returns.")
 
-;;; Shell-integration advice — agent identity
+;;; Shell-integration advice — command lifecycle and agent identity
 
-(defun my/eat-sup--on-set-cmd (cmd)
-  "Detect agent from shell-integration preexec CMD (base64-encoded)."
+(defun my/eat-sup--on-pre-cmd ()
+  "Record that Eat shell integration reported a command start."
+  (setq-local my/eat-sup--command-running t))
+
+(defun my/eat-sup--decode-command (cmd)
+  "Decode Eat shell-integration CMD and normalize it for display."
   (when-let ((command (ignore-errors
                         (decode-coding-string
                          (base64-decode-string cmd)
                          locale-coding-system))))
-    (let ((agent (cond
-                  ((string-match-p "claude" command) 'claude)
-                  ((string-match-p "codex"  command) 'codex)
-                  (t 'shell))))
+    (let ((command (string-trim
+                    (replace-regexp-in-string "[[:space:]\n]+" " " command))))
+      (unless (string-empty-p command)
+        command))))
+
+(defun my/eat-sup--command-agent (command)
+  "Return the coding-agent symbol implied by COMMAND, or `shell'."
+  (cond
+   ((and command (string-match-p "claude" command)) 'claude)
+   ((and command (string-match-p "codex" command)) 'codex)
+   (t 'shell)))
+
+(defun my/eat-sup--on-set-cmd (cmd)
+  "Detect agent from shell-integration preexec CMD (base64-encoded)."
+  (when-let ((command (my/eat-sup--decode-command cmd)))
+    (let ((agent (my/eat-sup--command-agent command)))
       (setq-local my/eat-sup--agent          agent
+                  my/eat-sup--command        command
                   my/eat-sup--pending-idle-agent nil
                   my/eat-sup--session-active (memq agent '(claude codex))
                   my/eat-sup--last-working-marker 0.0))))
@@ -122,6 +144,8 @@ the done alert fires reliably regardless of whether working state was detected."
   (when (memq my/eat-sup--agent '(claude codex))
     (setq-local my/eat-sup--pending-idle-agent my/eat-sup--agent))
   (setq-local my/eat-sup--agent          'shell
+              my/eat-sup--command        nil
+              my/eat-sup--command-running nil
               my/eat-sup--session-active nil
               my/eat-sup--last-working-marker 0.0))
 
@@ -131,6 +155,8 @@ the done alert fires reliably regardless of whether working state was detected."
   "Face for :awaiting-approval rows.")
 (defface my/eat-sup-working '((t :foreground "goldenrod"))
   "Face for :working rows.")
+(defface my/eat-sup-running '((t :foreground "goldenrod"))
+  "Face for :running rows.")
 (defface my/eat-sup-idle '((t :foreground "green4"))
   "Face for :idle rows.")
 (defface my/eat-sup-exited '((t :inherit shadow))
@@ -217,23 +243,25 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
      ((and (or working-p (my/eat-sup--working-held-p now))
            (< (- now my/eat-sup--last-output) my/eat-sup-working-grace))
       :working)
+     (my/eat-sup--command-running :running)
      (t :idle))))
 
 ;;; Buffer init / output tracking
 
 (defun my/eat-sup--note-output ()
-  "Record the timestamp of the latest terminal output."
-  (let ((now (float-time)))
-    (setq-local my/eat-sup--last-output now)
-    (when (eq my/eat-sup--agent 'unknown)
-      (setq-local my/eat-sup--agent (my/eat-sup--detect-agent)))
-    (let ((plist (alist-get my/eat-sup--agent my/eat-sup-patterns)))
-      (when (and plist
-                 (my/eat-sup--working-marker-p
-                  plist
-                  (my/eat-sup--title)
-                  (my/eat-sup--tail my/eat-sup-working-window)))
-        (setq-local my/eat-sup--last-working-marker now)))))
+  "Record the timestamp of the latest terminal process output."
+  (unless my/eat--resizing
+    (let ((now (float-time)))
+      (setq-local my/eat-sup--last-output now)
+      (when (eq my/eat-sup--agent 'unknown)
+        (setq-local my/eat-sup--agent (my/eat-sup--detect-agent)))
+      (let ((plist (alist-get my/eat-sup--agent my/eat-sup-patterns)))
+        (when (and plist
+                   (my/eat-sup--working-marker-p
+                    plist
+                    (my/eat-sup--title)
+                    (my/eat-sup--tail my/eat-sup-working-window)))
+          (setq-local my/eat-sup--last-working-marker now))))))
 
 (defun my/eat-sup--init-buffer (proc)
   "Initialise supervisor state in PROC's buffer."
@@ -247,6 +275,8 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
                     my/eat-sup--last-state     :unknown
                     my/eat-sup--state-since    (float-time)
                     my/eat-sup--idle-alerted   nil
+                    my/eat-sup--command        nil
+                    my/eat-sup--command-running nil
                     my/eat-sup--session-active nil
                     my/eat-sup--pending-idle-agent nil)
         (add-hook 'eat-update-hook #'my/eat-sup--note-output nil t)))))
@@ -255,6 +285,9 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
   "Fire the :exited alert for known agents when PROC dies."
   (when-let ((buf (process-buffer proc)))
     (when (buffer-live-p buf)
+      (with-current-buffer buf
+        (setq-local my/eat-sup--command        nil
+                    my/eat-sup--command-running nil))
       (let ((agent (buffer-local-value 'my/eat-sup--agent buf)))
         (when (memq agent '(claude codex))
           (alert (format "%s in %s — exited"
@@ -324,6 +357,7 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
   (pcase state
     (:awaiting-approval 'my/eat-sup-awaiting)
     (:working           'my/eat-sup-working)
+    (:running           'my/eat-sup-running)
     (:idle              'my/eat-sup-idle)
     (:exited            'my/eat-sup-exited)
     (_                  'default)))
@@ -338,12 +372,23 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
           ((< s 3600) (format "%dm%02ds" (/ s 60) (mod s 60)))
           (t          (format "%dh%02dm" (/ s 3600) (/ (mod s 3600) 60))))))
 
+(defun my/eat-sup--format-program ()
+  "Return the program column text for the current buffer."
+  (let ((program (if (and my/eat-sup--command-running my/eat-sup--command)
+                     my/eat-sup--command
+                   (symbol-name my/eat-sup--agent))))
+    (propertize program
+                'face (if my/eat-sup--command-running
+                          'my/eat-sup-running
+                        'default)
+                'help-echo program)))
+
 (defun my/eat-sup--list-entries ()
   (cl-loop for buf in (my/eat-sup--alive-buffers)
            collect
            (with-current-buffer buf
              (list buf
-                   (vector (symbol-name my/eat-sup--agent)
+                   (vector (my/eat-sup--format-program)
                            (my/eat-sup--format-state my/eat-sup--state)
                            (my/eat-sup--format-idle my/eat-sup--state-since)
                            (buffer-name buf)
@@ -379,7 +424,7 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
   "EatSupervisor"
   "Tabulated view of live eat agent terminals."
   (setq tabulated-list-format
-        [("Agent"  10 t)
+        [("Program" 44 t)
          ("State"  18 t)
          ("Idle"    8 t)
          ("Buffer" 24 t)
@@ -414,7 +459,8 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
     (dolist (buf (my/eat-sup--alive-buffers))
       (pcase (buffer-local-value 'my/eat-sup--state buf)
         (:awaiting-approval (cl-incf aw))
-        (:working           (cl-incf wk))))
+        (:working           (cl-incf wk))
+        (:running           (cl-incf wk))))
     (list :awaiting aw :working wk)))
 
 (defun my/eat-sup--build-mode-line ()
@@ -433,7 +479,7 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
                          (when (> wk 0) (format "▶%d" wk))
                          "]")
                  'face       (if (> aw 0) 'my/eat-sup-awaiting 'my/eat-sup-working)
-                 'help-echo  "eat agents — click to open supervisor"
+                 'help-echo  "eat terminals — click to open supervisor"
                  'mouse-face 'mode-line-highlight
                  'local-map  map))))))
 
@@ -461,6 +507,7 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
     (require 'alert)
     (add-hook 'eat-exec-hook #'my/eat-sup--init-buffer)
     (add-hook 'eat-exit-hook #'my/eat-sup--on-exit)
+    (advice-add 'eat--pre-cmd           :after #'my/eat-sup--on-pre-cmd)
     (advice-add 'eat--set-cmd           :after #'my/eat-sup--on-set-cmd)
     (advice-add 'eat--before-new-prompt :after #'my/eat-sup--on-new-prompt)
     (dolist (buf (my/eat-sup--alive-buffers))
@@ -478,6 +525,7 @@ Prefers the buffer-local value set by shell-integration advice; falls back to
    (t
     (remove-hook 'eat-exec-hook #'my/eat-sup--init-buffer)
     (remove-hook 'eat-exit-hook #'my/eat-sup--on-exit)
+    (advice-remove 'eat--pre-cmd           #'my/eat-sup--on-pre-cmd)
     (advice-remove 'eat--set-cmd           #'my/eat-sup--on-set-cmd)
     (advice-remove 'eat--before-new-prompt #'my/eat-sup--on-new-prompt)
     (when (timerp my/eat-sup--timer)

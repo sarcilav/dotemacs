@@ -1,4 +1,5 @@
 (require 'eat)
+(require 'seq)
 
 (setq eat-kill-buffer-on-exit t
       ;; Eat implements terminal-requested cursor blink by toggling a buffer-local
@@ -14,19 +15,117 @@
 (defvar my/eat-buffer-list nil
   "Ordered list of live eat terminal buffers, mirroring multi-term-buffer-list.")
 
+(defcustom my/eat-resize-debounce-delay 0.2
+  "Seconds to wait before applying the latest Eat terminal size.
+Set this to zero to resize synchronously after every window change."
+  :type 'number
+  :group 'eat)
+
+(defvar my/eat--resizing nil
+  "Non-nil while applying a resize-only Eat update.")
+
+(defvar my/eat--force-resize nil
+  "Non-nil while a pending Eat resize is being applied.")
+
+(defvar-local my/eat--resize-timer nil
+  "Timer waiting to apply this Eat buffer's latest window size.")
+
+(defvar-local my/eat--base-window-size-function nil
+  "Window-size function wrapped by `my/eat--debounced-window-size'.")
+
+(defun my/eat--cancel-resize-timer ()
+  "Cancel the pending resize timer in the current buffer."
+  (when (timerp my/eat--resize-timer)
+    (cancel-timer my/eat--resize-timer))
+  (setq my/eat--resize-timer nil))
+
+(defun my/eat--apply-pending-resize (buffer)
+  "Apply the settled terminal size for Eat BUFFER."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (setq my/eat--resize-timer nil)
+      (let ((proc (get-buffer-process buffer))
+            (windows (get-buffer-window-list buffer nil 'visible)))
+        (when (and (process-live-p proc) windows eat-terminal)
+          (let (size)
+            (let ((my/eat--force-resize t)
+                  (my/eat--resizing t))
+              (setq size (eat--adjust-process-window-size proc windows)))
+            (when size
+              (set-process-window-size proc (cdr size) (car size)))))))))
+
+(defun my/eat--schedule-resize (buffer)
+  "Schedule a settled terminal resize for Eat BUFFER."
+  (my/eat--cancel-resize-timer)
+  (setq my/eat--resize-timer
+        (run-at-time my/eat-resize-debounce-delay nil
+                     #'my/eat--apply-pending-resize buffer)))
+
+(defun my/eat--debounced-window-size (process windows)
+  "Return a settled size for PROCESS displayed in WINDOWS.
+Ordinary resize requests are coalesced.  A forced request delegates to the
+window-size function that was active when the Eat buffer was configured."
+  (let ((size-function (or my/eat--base-window-size-function
+                           #'window-adjust-process-window-size-smallest)))
+    (cond
+     ((<= my/eat-resize-debounce-delay 0)
+      (funcall size-function process windows))
+     (my/eat--force-resize
+      (let ((size (funcall size-function process windows)))
+        (unless (and size eat-terminal
+                     (equal size (eat-term-size eat-terminal)))
+          size)))
+     (t
+      (my/eat--schedule-resize (current-buffer))
+      nil))))
+
+(defun my/eat--configure-resizing ()
+  "Configure debounced process resizing in the current Eat buffer."
+  (unless (eq window-adjust-process-window-size-function
+              #'my/eat--debounced-window-size)
+    (setq-local my/eat--base-window-size-function
+                window-adjust-process-window-size-function))
+  (setq-local window-adjust-process-window-size-function
+              #'my/eat--debounced-window-size)
+  (add-hook 'kill-buffer-hook #'my/eat--cancel-resize-timer nil t))
+
+(add-hook 'eat-mode-hook #'my/eat--configure-resizing)
+
+(defun my/eat-prune-buffer-list ()
+  "Remove dead buffers from `my/eat-buffer-list'."
+  (setq my/eat-buffer-list (seq-filter #'buffer-live-p my/eat-buffer-list)))
+
+(defun my/eat-forget-current-buffer ()
+  "Remove the current buffer from `my/eat-buffer-list'."
+  (setq my/eat-buffer-list
+        (delq (current-buffer) (my/eat-prune-buffer-list))))
+
+(defun my/eat-switch-to-buffer-if-live (buf)
+  "Switch to BUF if it is still live."
+  (when (buffer-live-p buf)
+    (switch-to-buffer buf)))
+
 (defun my/eat-on-exec (proc)
   "Register a new eat terminal buffer in `my/eat-buffer-list'."
   (let ((buf (process-buffer proc)))
-    (unless (memq buf my/eat-buffer-list)
-      (setq my/eat-buffer-list (nconc my/eat-buffer-list (list buf))))))
+    (when (buffer-live-p buf)
+      (my/eat-prune-buffer-list)
+      (unless (memq buf my/eat-buffer-list)
+        (setq my/eat-buffer-list (nconc my/eat-buffer-list (list buf))))
+      (with-current-buffer buf
+        (my/eat--cancel-resize-timer)
+        (add-hook 'kill-buffer-hook #'my/eat-forget-current-buffer nil t)))))
 
 (defun my/eat-on-exit (proc)
-  "Switch to the next eat buffer and remove the closed one from the list."
+  "Remove the closed eat buffer and switch to another one after cleanup."
   (let* ((closed (process-buffer proc))
-         (other  (seq-find (lambda (b) (not (eq b closed)))
-                           my/eat-buffer-list)))
-    (when other (switch-to-buffer other))
-    (setq my/eat-buffer-list (delq closed my/eat-buffer-list))))
+         (other  (car (delq closed (my/eat-prune-buffer-list)))))
+    (setq my/eat-buffer-list (delq closed my/eat-buffer-list))
+    (when (buffer-live-p closed)
+      (with-current-buffer closed
+        (my/eat--cancel-resize-timer)))
+    (when (buffer-live-p other)
+      (run-at-time 0 nil #'my/eat-switch-to-buffer-if-live other))))
 
 (add-hook 'eat-exec-hook #'my/eat-on-exec)
 (add-hook 'eat-exit-hook #'my/eat-on-exit)
@@ -39,7 +138,7 @@ With a numeric prefix ARG, switch to terminal number ARG instead."
 
 (defun my/eat-switch (direction)
   "Cycle eat buffers; DIRECTION is `next or `previous."
-  (let* ((bufs (seq-filter #'buffer-live-p my/eat-buffer-list))
+  (let* ((bufs (my/eat-prune-buffer-list))
          (idx  (seq-position bufs (current-buffer))))
     (cond
      ((null bufs) (my/eat))

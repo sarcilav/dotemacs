@@ -1,4 +1,4 @@
-;;; handlebars-sgml-mode-autoloads.el --- automatically extracted autoloads
+;;; handlebars-sgml-mode-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

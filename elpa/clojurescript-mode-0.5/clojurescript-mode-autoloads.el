@@ -1,4 +1,4 @@
-;;; clojurescript-mode-autoloads.el --- automatically extracted autoloads
+;;; clojurescript-mode-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

@@ -1,4 +1,4 @@
-;;; pretty-lambdada-autoloads.el --- automatically extracted autoloads
+;;; pretty-lambdada-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

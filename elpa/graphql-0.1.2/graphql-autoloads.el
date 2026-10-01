@@ -1,4 +1,4 @@
-;;; graphql-autoloads.el --- automatically extracted autoloads
+;;; graphql-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

@@ -1,0 +1,2 @@
+;; Generated package description from clojure-mode.el  -*- no-byte-compile: t; lexical-binding:t -*-
+(define-package "clojure-mode" "5.23.0" "Major mode for Clojure code" '((emacs "27.1")) :commit "9146525680b29a0c6b72a1126d075b54f8066710" :maintainer '("Bozhidar Batsov" . "bozhidar@batsov.dev") :keywords '("languages" "clojure" "clojurescript" "lisp") :url "https://github.com/clojure-emacs/clojure-mode")

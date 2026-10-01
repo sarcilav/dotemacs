@@ -1,4 +1,4 @@
-;;; rainbow-delimiters-autoloads.el --- automatically extracted autoloads
+;;; rainbow-delimiters-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

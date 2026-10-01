@@ -1,4 +1,4 @@
-;;; paredit-autoloads.el --- automatically extracted autoloads
+;;; paredit-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

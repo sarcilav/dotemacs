@@ -1,4 +1,4 @@
-;;; ssh-agency-autoloads.el --- automatically extracted autoloads
+;;; ssh-agency-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

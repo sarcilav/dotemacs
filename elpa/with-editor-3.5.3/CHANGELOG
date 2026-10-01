@@ -1,0 +1,60 @@
+# -*- mode: org -*-
+* v3.5.3    2026-08-01
+
+- Added support for Eat terminals.  #128
+
+- When called as commands ~with-editor-export-editor~ and its wrappers
+  no longer call ~clear~.  #128
+
+* v3.5.2    2026-07-01
+
+- Added kludge to work around bug in "server.el", which was not fixed
+  until Emacs 31.1.  #139
+
+* v3.5.1    2026-06-01
+
+- Advice shell-command process filter instead of replacing it.  #138
+
+- Dropped support for Emacs 26 and 27.
+
+* v3.5.0    2026-05-01
+
+- Append newline to emacsclient commands as required by Emacs 31.1.
+  #137
+
+* v3.4.9    2026-03-01
+
+- Thoughts and whitespace.
+
+* v3.4.8    2026-01-01
+
+- Various build improvements.
+
+* v3.4.7    2025-11-01
+
+- Thoughts and whitespace.
+
+* v3.4.6    2025-09-01
+
+- Thoughts and whitespace.
+
+* v3.4.5    2025-08-01
+
+- No longer add "clear" to the shell's history when using vterm. #135
+
+* v3.4.4    2025-06-01
+
+- Added kludge for Nix on macOS.  #134
+
+* v3.4.3    2024-12-01
+
+- Added new variable ~with-editor-emacsclient-program-suffixes~.  #132
+
+* v3.4.2    2024-09-01
+
+- Fixed ~shell-command-with-editor-mode~ for remote processes.  #129
+
+- ~with-editor-export-editor~ now waits longer for the terminal to get
+  ready.  #130
+
+- Updated tooling.

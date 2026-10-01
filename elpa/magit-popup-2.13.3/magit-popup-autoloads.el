@@ -1,4 +1,4 @@
-;;; magit-popup-autoloads.el --- automatically extracted autoloads
+;;; magit-popup-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

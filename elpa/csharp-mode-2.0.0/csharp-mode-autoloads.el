@@ -1,4 +1,4 @@
-;;; csharp-mode-autoloads.el --- automatically extracted autoloads
+;;; csharp-mode-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

@@ -1,4 +1,4 @@
-;;; spinner-autoloads.el --- automatically extracted autoloads
+;;; spinner-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

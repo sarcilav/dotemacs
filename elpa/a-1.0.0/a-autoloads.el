@@ -1,4 +1,4 @@
-;;; a-autoloads.el --- automatically extracted autoloads
+;;; a-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

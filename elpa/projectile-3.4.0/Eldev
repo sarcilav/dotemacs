@@ -1,0 +1,32 @@
+(eldev-use-package-archive 'gnu-elpa)
+(eldev-use-package-archive 'melpa)
+
+;; The test suite is split across several files in `test/' that all
+;; `require' the shared `projectile-test-helpers' module, so put that
+;; directory on the load path when running tests.
+(eldev-add-loading-roots 'test "test")
+
+;; `transient' powers `projectile-dispatch'.  It's bundled with Emacs 28.1+
+;; (Projectile's minimum), but pull it in explicitly for building and testing so
+;; a recent version is used and the transient menu definition is validated.
+(eldev-add-extra-dependencies 'build 'transient)
+(eldev-add-extra-dependencies 'test 'transient)
+
+;; `projectile-consult.el' is an optional Consult integration that ships with
+;; Projectile but is loaded only on demand (Consult is a soft dependency, not
+;; part of Projectile's `Package-Requires').  Pull Consult in just for building
+;; and testing so the module compiles against the real library and its specs
+;; run.  Consult requires Emacs 29.1+, so we can only install it there; on older
+;; Emacsen the module still byte-compiles cleanly without Consult (the functions
+;; it uses are forward-declared) and its specs self-skip via `assume'.
+(when (version<= "29.1" emacs-version)
+  (eldev-add-extra-dependencies 'build 'consult)
+  (eldev-add-extra-dependencies 'test 'consult))
+
+;; Eldev regenerates `projectile-pkg.el' from the package headers on every
+;; build.  Some CI images then byte-compile the leftover copy and, under
+;; `--warnings-as-errors', fail on its missing `lexical-binding' cookie (which
+;; a generated `define-package' file doesn't carry).  It's generated metadata,
+;; not project source, so keep it out of the build/lint filesets.
+(setf eldev-standard-excludes
+      `(:or ,eldev-standard-excludes "./projectile-pkg.el"))

@@ -1,4 +1,4 @@
-;;; go-mode-autoloads.el --- automatically extracted autoloads
+;;; go-mode-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 (add-to-list 'load-path (or (file-name-directory #$) (car load-path)))

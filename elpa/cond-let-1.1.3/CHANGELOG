@@ -1,0 +1,29 @@
+# -*- mode: org -*-
+* v1.1.3    2026-07-01
+
+- Fixed a typo in documentation.
+
+* v1.1.2    2026-06-01
+
+- Fixed a test pasto and a docstring typo.
+
+* v1.1.1    2026-05-11
+
+- Reverted accidental change to ~when$~'s indentation declaration.
+  6a133d7
+
+* v1.1.0    2026-05-11
+
+- Added new macro ~thread$~.  d87c492
+
+- Macro ~and$~ now accepts more than two arguments, like ~and>~ already
+  did.  ~and>~ is now an alias for ~and$~.  Please see its docstring if
+  you would like to keep using it.  ee63a74
+
+- Fixed debug declaration of ~when$~ and ~while-let*~.  903a5e3, 680cd26
+
+- Added indentation declaration for ~and$~.  93768a2
+
+* v1.0.0    2026-05-01
+
+First stable release.

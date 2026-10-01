@@ -1,0 +1,2 @@
+;; Generated package description from projectile.el  -*- mode: lisp-data; no-byte-compile: t; lexical-binding:t -*-
+(define-package "projectile" "3.4.0" "Manage and navigate projects in Emacs easily" '((emacs "28.1") (compat "30")) :commit "b60bb09927a6c78793dc96a2da3c5a8d4cec3062" :authors '(("Bozhidar Batsov" . "bozhidar@batsov.dev")) :maintainer '("Bozhidar Batsov" . "bozhidar@batsov.dev") :keywords '("project" "convenience") :url "https://github.com/bbatsov/projectile")

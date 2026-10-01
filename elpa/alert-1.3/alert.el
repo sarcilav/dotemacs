@@ -200,6 +200,18 @@
 ;; shut up the byte compiler
 (declare-function alert-gntp-notify "alert")
 (declare-function alert-notifications-notify "alert")
+(declare-function x-change-window-property "xfns.c")
+(declare-function x-window-property "xfns.c")
+;; Functions generated dynamically by log4e:deflogger.
+(declare-function alert--log-set-level "alert")
+(declare-function alert--log-enable-logging "alert")
+(declare-function alert--log-clear-log "alert")
+(declare-function alert--log-fatal "alert")
+(declare-function alert--log-error "alert")
+(declare-function alert--log-warn "alert")
+(declare-function alert--log-info "alert")
+(declare-function alert--log-debug "alert")
+(declare-function alert--log-trace "alert")
 
 (defgroup alert nil
   "Notification system for Emacs similar to Growl"

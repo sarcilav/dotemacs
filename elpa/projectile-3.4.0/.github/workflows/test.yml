@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    paths-ignore: ['**.md', '**.adoc']
+  pull_request:
+    paths-ignore: ['**.md', '**.adoc']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # Run inside the prebuilt silex/emacs images (Eldev baked in) instead of
+    # installing Emacs via Nix.  The Nix-based setup resolves nix-emacs-ci
+    # through unauthenticated GitHub API calls, which get throttled (HTTP 429)
+    # on busy shared runners; the images are pulled from Docker Hub instead.
+    # The matrix labels stay as-is (so the check names don't change); only the
+    # `snapshot' label maps to the image's `master' tag.
+    container: silex/emacs:${{ matrix.emacs_version == 'snapshot' && 'master' || matrix.emacs_version }}-ci-eldev
+    continue-on-error: ${{matrix.emacs_version == 'snapshot'}}
+
+    strategy:
+      matrix:
+        # Earliest supported + latest in each stable branch + snapshot.
+        emacs_version: ['28.2', '29.4', '30.2', 'snapshot']
+
+    steps:
+    - name: Check out the source code
+      uses: actions/checkout@v6
+
+    # ripgrep powers the search reviewer's fast-path; install it so the specs
+    # that exercise the real `rg' subprocess actually run in CI instead of
+    # being skipped (they self-skip when `rg' is absent).
+    - name: Install ripgrep
+      run: |
+        apt-get update
+        apt-get install -y ripgrep
+
+    # Same idea for jj: the Jujutsu workspace specs shell out to the real
+    # binary and self-skip without it.  It isn't in the image's Debian, so
+    # take the release tarball; the version is pinned so that a jj release
+    # can't turn into a CI failure nobody asked for.
+    - name: Install jj
+      env:
+        JJ_VERSION: v0.44.0
+      run: |
+        tmp=$(mktemp -d)
+        curl -fsSL "https://github.com/jj-vcs/jj/releases/download/${JJ_VERSION}/jj-${JJ_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+          | tar -xz -C "$tmp"
+        install -m 755 "$tmp/jj" /usr/local/bin/jj
+        rm -rf "$tmp"
+        jj --version
+
+    - name: Test the project
+      run: |
+        eldev -p -dtT -C test --expect 680
+        eldev -dtT -C compile --warnings-as-errors
+
+  lint:
+    runs-on: ubuntu-latest
+    # Linting is version-independent, so run it once on a single stable image
+    # rather than across the whole matrix.  checkdoc and package-lint output
+    # can drift between Emacs versions, so pinning one version keeps the
+    # report-only steps deterministic.
+    container: silex/emacs:30.2-ci-eldev
+
+    steps:
+    - name: Check out the source code
+      uses: actions/checkout@v6
+
+    # relint is clean on the codebase, so it is a hard gate: a bad regexp
+    # (e.g. an ineffective escape) fails the build.
+    - name: Lint regexps (relint)
+      run: eldev -dtT lint re
+
+    # checkdoc and package-lint surface a large backlog of pre-existing
+    # style/metadata warnings on the 9000-line main file.  Run them for
+    # visibility only (the step is annotated but does not fail the build) so
+    # new warnings show up in the log without blocking on legacy ones.
+    - name: Lint docstrings and package metadata (report-only)
+      continue-on-error: true
+      run: eldev -dtT lint doc package

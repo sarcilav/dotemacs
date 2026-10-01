@@ -1,4 +1,4 @@
-;;; fzf-autoloads.el --- automatically extracted autoloads
+;;; fzf-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

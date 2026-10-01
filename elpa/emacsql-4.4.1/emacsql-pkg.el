@@ -1,0 +1,2 @@
+;; Generated package description from emacsql.el  -*- mode: lisp-data; no-byte-compile: t; lexical-binding:t -*-
+(define-package "emacsql" "4.4.1" "High-level SQL database front-end" '((emacs "28.1")) :commit "d811bbefcb5e27841af55cae53aa939ba720de77" :authors '(("Christopher Wellons" . "wellons@nullprogram.com")) :maintainer '("Jonas Bernoulli" . "emacs.emacsql@jonas.bernoulli.dev") :url "https://github.com/magit/emacsql")

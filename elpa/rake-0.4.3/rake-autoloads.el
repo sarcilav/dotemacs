@@ -1,4 +1,4 @@
-;;; rake-autoloads.el --- automatically extracted autoloads
+;;; rake-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

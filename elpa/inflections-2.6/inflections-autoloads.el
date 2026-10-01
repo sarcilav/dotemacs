@@ -1,4 +1,4 @@
-;;; inflections-autoloads.el --- automatically extracted autoloads
+;;; inflections-autoloads.el --- automatically extracted autoloads -*- lexical-binding: nil; -*-
 ;;
 ;;; Code:
 

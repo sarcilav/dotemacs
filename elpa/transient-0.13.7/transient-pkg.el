@@ -1,0 +1,2 @@
+;; Generated package description from transient.el  -*- mode: lisp-data; no-byte-compile: t; lexical-binding:t -*-
+(define-package "transient" "0.13.7" "Transient commands" '((emacs "28.1") (compat "31.0") (cond-let "1.1") (llama "1.0") (seq "2.24")) :commit "0ec75dcce235f5ab3d39a02b878e6aaa78159b22" :authors '(("Jonas Bernoulli" . "emacs.transient@jonas.bernoulli.dev")) :maintainer '("Jonas Bernoulli" . "emacs.transient@jonas.bernoulli.dev") :keywords '("extensions") :url "https://github.com/magit/transient")

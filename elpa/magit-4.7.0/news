@@ -1,0 +1,104 @@
+# -*- mode: org -*-
+* v4.7.0    2026-08-01
+
+- If the region marks a single commit, ~magit-patch-create~ now creates
+  a patch for that, instead of prompting.  Previously that was only
+  done if multiple commit were marked.  #4734
+
+- When reading a value for ~git diff~'s ~--find-renames~ or ~--find-copies~
+  argument, the similarity index can now be specified as a percentage
+  or as a fraction.  The input now has to exactly match the value, as
+  used by Git; e.g., "20%" or "05".  The latter is interpreted as the
+  fraction 0.05.  #4708
+
+- Added optional DIRECTORY argument to ~magit-status-quick~, intended
+  for use in third-party repository switchers.  #4636
+
+- Added new command ~magit-log-reflog~, which shows the log for all
+  objects mentioned in all reflogs.  #4748
+
+- When ~gpg.format~ specifies a format other than openpgp, the menu
+  argument ~--gpg-sign~ now acts as a boolean toggle.  Previously it
+  always wanted to read an openpgp key, making it impossible to
+  toggle ssh or x509 signing from the menu.  The used format is now
+  shown in the menu.  #5046
+
+- Added ~--reject~ to ~magit-am~ menu.  #5148
+
+- Added Git v2.55's new ~--graph-lane-limit~ to log menus.  It is hidden
+  by default and not available when using an older Git.  #5088
+
+- ~magit-file-untrack~, ~magit-file-rename~, ~magit-file-delete~ and
+  ~magit-do-async-shell-command~ can now act on directories.  #5247
+
+- ~magit-process-kill~ now first tries to interrupt the process.
+  If that fails, a second invocation instead kills it.  #5086
+
+- Added help text for the ~Filter!~ status section.  #5121
+
+- By default, submodules with untracked content are now also listed
+  in the status of the super-repository.  #5448
+
+- Added ~--redit-message~ to the ~magit-commit~ menu.  That argument and
+  ~--reuse-message~ now usually default to the commit at point, but when
+  invoked with a prefix argument, the user can instead select the
+  commit from a log.  #5602
+
+- Added new option ~magit-submodule-list-predicate~ and taught
+  ~magit-submodule-list~ to support unpopulated modules.  #5077
+
+- When ~magit-bisect-start~ and ~magit-bisect-run~ are invoked with the
+  region marking a range of consecutive commit, the commits at the
+  ends are used as the good and bad commits.  #5049
+
+- ~magit-branch-checkout~ now always passes the commit, which is to be
+  checked out, to the function used to read the worktree directory
+  from the user.  Previously this was only done for local branches.
+  #5502
+
+- Added new command ~magit-checkout-remote-ref~.  #5410
+
+- ~magit-project-status~ is no longer added to ~project-switch-commands~.
+  See the command's docstring to learn how to add it yourself.
+
+- Added new command ~magit-project-dispatch~.  #5163
+
+- Added new option ~magit-revision-use-dedicated-buffers~.  #5330, #5248
+
+- Added new function ~magit-insert-nested-repositories~.  #5336
+
+- With a prefix argument ~magit-diff-buffer-file~ now only shows
+  unstaged changes.  #5013
+
+- Added new command ~magit-copy-diff-as-kill~.  #5595
+
+- Added new command ~magit-parent-status~.  #5022
+
+- If upstream itself is not reachable, ~magit-commit-absorb~ and
+  ~magit-commit-autofixup~ now conveniently place the cursor on the
+  merge-base of that and HEAD, instead of on HEAD.  #5579
+
+- Added new command ~magit-pull-into-upstream~.  #4943
+
+- Improved order of choices when reading the starting-point for a
+  new branch.  #5243
+
+- Added new command ~magit-show-commit-removing-file~.  #5562
+
+- Added support for bookmarking blob-visiting buffers.  #4854
+
+- Added ~--push-option~ to ~magit-push~ menu.  It is hidden by default.
+  Also added new variable ~magit-push-options~, which controls the
+  push options offered when setting the argument.  #5478
+
+- The ~--rebase~ argument now takes a value and all valid values for
+  the of ~branch.<name>.rebase~ and ~pull.rebase~ Git variables are now
+  supported.  #5224
+
+- Added ~--merges~ to ~magit-log~ and ~magit-log-refresh~ menus.  #5299
+
+Bugfixes:
+
+- ~magit-ignore-submodules-p~ didn't return ~nil~ for ~none~.
+...
+...
